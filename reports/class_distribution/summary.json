@@ -1,0 +1,46 @@
+{
+  "unit": "lesion",
+  "class_order": [
+    "AKIEC",
+    "BCC",
+    "BEN_OTH",
+    "BKL",
+    "DF",
+    "INF",
+    "MAL_OTH",
+    "MEL",
+    "NV",
+    "SCCKA",
+    "VASC"
+  ],
+  "train_lesions": 4192,
+  "validation_lesions": 1048,
+  "total_lesions": 5240,
+  "train_fraction": 0.8,
+  "validation_fraction": 0.2,
+  "largest_class": "BCC",
+  "smallest_present_class": "MAL_OTH",
+  "largest_to_smallest_present_ratio": 280.22222222222223,
+  "maximum_absolute_proportion_gap_pp": 0.0477099236641223,
+  "training_majority_class": "BCC",
+  "majority_only_validation_accuracy_percent": 48.091603053435115,
+  "checks": {
+    "unique_lesions_within_splits": true,
+    "splits_disjoint": true,
+    "labels_match_one_hot": true
+  },
+  "sources": {
+    "training": {
+      "path": "DATA/PROCESSED_DATA/train_split.csv",
+      "sha256": "ffca74529e57449cb11e506cfa2fce959bf7d559ff1f97834a0f14b6d2875234"
+    },
+    "validation": {
+      "path": "DATA/PROCESSED_DATA/val_split.csv",
+      "sha256": "c40b840c94668d8494d06139dca6bd0fa5b6302f45056f6309abfab4b7b76022"
+    }
+  },
+  "environment": {
+    "python": "3.13.0",
+    "matplotlib": "3.10.8"
+  }
+}

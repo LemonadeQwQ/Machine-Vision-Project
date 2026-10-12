@@ -2,3 +2,11 @@ DATA
 *.jpg
 *.jpeg
 *.png
+
+# Keep generated analysis figures available for the project report.
+!reports/class_distribution/*.png
+
+# Local Python environments and bytecode.
+.venv/
+__pycache__/
+*.pyc

@@ -1,0 +1,2 @@
+# Dependencies for src/analyze_class_distribution.py only.
+matplotlib==3.10.8
