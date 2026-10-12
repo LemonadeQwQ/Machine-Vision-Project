@@ -11,9 +11,12 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+if __package__:
+    from .class_schema import CLASSES
+else:
+    from class_schema import CLASSES
+
 ROOT = Path(__file__).resolve().parents[1]
-CLASSES = ("AKIEC", "BCC", "BEN_OTH", "BKL", "DF", "INF",
-           "MAL_OTH", "MEL", "NV", "SCCKA", "VASC")
 
 
 def read_labels(path):

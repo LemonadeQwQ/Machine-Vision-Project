@@ -1,0 +1,4 @@
+# Evaluation only; model training dependencies are separate.
+-r requirements-analysis.txt
+numpy==2.4.3
+scikit-learn==1.8.0

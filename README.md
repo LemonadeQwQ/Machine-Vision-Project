@@ -40,3 +40,26 @@ current directory. Rerunning replaces generated outputs with the same names.
 This analysis describes the label distribution. It does not report trained-model
 performance or establish that image files are present. Model training still
 requires the original MILK10k images and a separate training environment.
+
+## Unified model evaluation
+
+Evaluate model probability exports against the validation labels. The tool matches
+`lesion_id`, checks all 11 class probabilities and saves Accuracy, Macro F1, per-class
+metrics and count/normalized confusion matrices.
+
+```powershell
+python -m pip install -r requirements-evaluation.txt
+python src/evaluate.py --predictions path/to/predictions.csv --output-dir reports/evaluation/run_01 --model-name model_01
+```
+
+Replace the prediction path with a real model export. The output directory stores
+evaluation results; the model name is only a display label. See the
+[evaluation guide](docs/evaluation.md) for the exact CSV format, metric rules,
+Windows environment setup and examples. No trained model is needed to run the
+[included synthetic demonstration](reports/evaluation_demo/README.md).
+
+Run the verification tests:
+
+```powershell
+python -m unittest discover -s tests -v
+```

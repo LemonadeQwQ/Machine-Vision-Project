@@ -5,6 +5,8 @@ DATA
 
 # Keep generated analysis figures available for the project report.
 !reports/class_distribution/*.png
+!reports/evaluation_demo/*.png
+!reports/evaluation/**/*.png
 
 # Local Python environments and bytecode.
 .venv/

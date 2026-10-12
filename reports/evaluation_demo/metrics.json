@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "model_name": "Synthetic demo - not trained model performance",
+  "unit": "lesion",
+  "n_lesions": 22,
+  "class_order": [
+    "AKIEC",
+    "BCC",
+    "BEN_OTH",
+    "BKL",
+    "DF",
+    "INF",
+    "MAL_OTH",
+    "MEL",
+    "NV",
+    "SCCKA",
+    "VASC"
+  ],
+  "primary_metric": "macro_f1",
+  "metric_scale": "0 to 1",
+  "accuracy": 0.8181818181818182,
+  "macro_f1": 0.8121212121212121,
+  "macro_precision": 0.8939393939393938,
+  "macro_recall": 0.8181818181818182,
+  "metric_policy": {
+    "macro_average_classes": "all 11, including classes absent from labels",
+    "zero_division": 0,
+    "prediction": "argmax probability",
+    "tie_break": "first class in class_order",
+    "probability_sum_atol": 1e-05,
+    "normalized_confusion_matrix": "rows divided by true-class support; absent rows stored as 0"
+  },
+  "tied_prediction_rows": 0,
+  "classes_without_true_examples": [],
+  "warnings": [],
+  "sources": {
+    "labels": {
+      "path": "examples/evaluation/synthetic_labels.csv",
+      "sha256": "9ae3f157cb1ab0ae09a4da70e29bd5079517ff9bf0812636e7b56d45c767b513"
+    },
+    "predictions": {
+      "path": "examples/evaluation/synthetic_predictions.csv",
+      "sha256": "09ce578acbe3e87d2d712e6c3648fd0c6e061dfc9f09f9ccf359c151500ad02f"
+    }
+  },
+  "environment": {
+    "python": "3.13.0",
+    "numpy": "2.4.3",
+    "scikit-learn": "1.8.0",
+    "matplotlib": "3.10.8"
+  }
+}
