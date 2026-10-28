@@ -16,4 +16,5 @@ def build_resnet50(num_classes=11):
     model.fc = nn.Linear(feature_dim, num_classes)
 
     # 后续需要得到概率分布则使用softmax即可，损失函数在用cross entropy即可
+    # update，需要使用weighted crooss entropy
     return model
