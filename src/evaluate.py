@@ -4,7 +4,6 @@
 # 输出：4 项整体指标、逐类指标、逐条预测记录，以及数量/比例两种混淆矩阵。
 # 评估对象是“每个病变的最终预测”，图片读取、模型训练和多骨干融合在上游完成。
 # 阅读顺序：main -> evaluate_files -> load_evaluation_data -> calculate_metrics -> 保存结果。
-
 # 标准库处理参数、CSV/JSON、文件路径、输入指纹和临时结果目录。
 import argparse
 import csv
@@ -20,16 +19,16 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, PercentFormatter
-# NumPy 处理 N×11 概率矩阵；scikit-learn 提供分类指标和混淆矩阵计算。
+# NumPy 处理 N×C 概率矩阵；scikit-learn 提供分类指标和混淆矩阵计算。
 import numpy as np
 import sklearn
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_fscore_support
 
 # 兼容 python -m src.evaluate 和直接执行脚本两种导入方式。
 if __package__:
-    from .class_schema import CLASSES
+    from .class_schema import CLASSES, NINE_CLASSES, EIGHT_CLASSES, validate_class_order
 else:
-    from class_schema import CLASSES
+    from class_schema import CLASSES, NINE_CLASSES, EIGHT_CLASSES, validate_class_order
 
 # 默认验证标签相对于脚本所在仓库定位；显式传入的相对路径仍相对于终端目录。
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,7 +44,7 @@ OUTPUT_FILES = (
 
 # CSV 的通用检查入口，返回（每行记录组成的列表，列名列表）。
 # required 指定必需列；exact=True 还会拒绝额外列，适用于严格的预测格式。
-def read_table(path, required, *, exact=False):
+def read_table(path, required, *, exact=False, id_column="lesion_id"):
     """Reject malformed CSVs before any output is written; IDs remain strings."""
     # 兼容带 BOM 的 UTF-8 文件；用列名读取，且保留病变编号的字符串形式。
     with Path(path).open(encoding="utf-8-sig", newline="") as stream:
@@ -56,7 +55,7 @@ def read_table(path, required, *, exact=False):
             raise ValueError(f"{path}: duplicate column names")
         missing = set(required) - set(columns)
         extra = set(columns) - set(required)
-        # 标签表允许附带其他元数据；预测表只能包含 lesion_id 和 11 个类别概率列。
+        # 标签表允许附带其他元数据；预测表只能包含 lesion_id 和 所选类别的概率列。
         if missing or (exact and extra):
             raise ValueError(
                 f"{path}: missing columns={sorted(missing)}, "
@@ -72,47 +71,46 @@ def read_table(path, required, *, exact=False):
         # 空字符串不属于字段数量错误，会由后续编号/概率检查处理。
         if None in row or any(value is None for value in row.values()):
             raise ValueError(f"{path}:{line}: row length does not match header")
-        lesion = row["lesion_id"]
+        lesion = row[id_column]
         # 不自动删去编号中的空格，避免悄悄把原本不同或错误的编号合并。
         if not lesion or lesion != lesion.strip():
-            raise ValueError(f"{path}:{line}: empty lesion_id or surrounding whitespace")
+            raise ValueError(f"{path}:{line}: empty {id_column} or surrounding whitespace")
         if lesion in seen:
-            raise ValueError(f"{path}:{line}: duplicate lesion_id {lesion!r}")
+            raise ValueError(f"{path}:{line}: duplicate {id_column} {lesion!r}")
         seen.add(lesion)
     return rows, columns
 
 
-# 加载并对齐两份输入，是计算指标之前必须经过的数据检查层。
-# 返回 ids（N 个编号）、y_true（N 个真实类别索引）、probabilities（N×11 概率矩阵）。
-def load_evaluation_data(labels_path, predictions_path):
+def load_evaluation_data(labels_path, predictions_path, *, class_names=CLASSES, id_column="lesion_id"):
     """Return IDs, integer true labels and probabilities in label-file row order."""
+    class_names = validate_class_order(class_names)
     # 最简真实标签只需编号和 label；现有验证集附带的 one-hot 列也能直接使用。
-    labels, columns = read_table(labels_path, ("lesion_id", "label"))
-    # one-hot 可完全省略，但只要出现任意一列，就必须包含全部 11 列并与 label 一致。
+    if id_column not in ("lesion_id", "sample_id"):
+        raise ValueError("Unsupported ID column")
+    labels, columns = read_table(labels_path, (id_column, "label"), id_column=id_column)
+    # one-hot 可完全省略，但只要出现任意一列，就必须包含所选全部类别列并与 label 一致。
     one_hot = set(columns) & set(CLASSES)
-    if one_hot and one_hot != set(CLASSES):
-        raise ValueError(f"{labels_path}: supply all 11 one-hot columns or none")
+    if one_hot and one_hot != set(class_names):
+        raise ValueError(f"{labels_path}: supply exactly all {len(class_names)} one-hot columns or none")
     for row in labels:
         label = row["label"]
-        if label not in CLASSES:
+        if label not in class_names:
             raise ValueError(f"{labels_path}: unknown label {label!r}")
         if one_hot:
             try:
-                values = [float(row[c]) for c in CLASSES]
+                values = [float(row[c]) for c in class_names]
             except ValueError as exc:
                 raise ValueError(f"{labels_path}: invalid one-hot values") from exc
-            # 根据 label 构造期望的 one-hot，例如 BCC 应为 [0, 1, 0, ...]。
-            if values != [float(c == label) for c in CLASSES]:
+            if values != [float(c == label) for c in class_names]:
                 raise ValueError(
-                    f"{labels_path}: one-hot columns disagree with label for {row['lesion_id']}"
+                    f"{labels_path}: one-hot columns disagree with label for {row[id_column]}"
                 )
 
-    # 预测表必须严格遵守统一格式，不能直接传类别编号、额外 label 列或不完整概率。
-    predictions, _ = read_table(predictions_path, ("lesion_id", *CLASSES), exact=True)
+    predictions, _ = read_table(predictions_path, (id_column, *class_names), exact=True, id_column=id_column)
     # 先建立“编号 -> 预测记录”字典，再按标签表的编号顺序取预测。
     # 因此两个 CSV 的行顺序可以不同，不会把不同病变的结果配在一起。
-    by_id = {row["lesion_id"]: row for row in predictions}
-    ids = [row["lesion_id"] for row in labels]
+    by_id = {row[id_column]: row for row in predictions}
+    ids = [row[id_column] for row in labels]
     # 必须评估标签文件中的全部病变；不允许悄悄丢弃缺失预测或额外预测。
     missing = set(ids) - set(by_id)
     extra = set(by_id) - set(ids)
@@ -126,7 +124,7 @@ def load_evaluation_data(labels_path, predictions_path):
     # 只能核对列名；模型导出时若把某类概率误写到另一列，数字本身无法揭示这种错误。
     try:
         probabilities = np.array(
-            [[float(by_id[lesion][c]) for c in CLASSES] for lesion in ids], dtype=float
+            [[float(by_id[lesion][c]) for c in class_names] for lesion in ids], dtype=float
         )
     except ValueError as exc:
         raise ValueError("Probabilities must be numeric, with no empty cells") from exc
@@ -139,7 +137,7 @@ def load_evaluation_data(labels_path, predictions_path):
             f"Probabilities must be finite and within [0, 1]; invalid lesion: "
             f"{ids[int(np.flatnonzero(invalid)[0])]}"
         )
-    # axis=1 对每个病变的 11 类概率求和；rtol=0 表示只使用绝对误差。
+    # axis=1 对每个病变的 所选类别概率求和；rtol=0 表示只使用绝对误差。
     # 这里不做 softmax 或自动归一化；上游应导出概率，而不是原始 logits。
     bad_sums = ~np.isclose(probabilities.sum(axis=1), 1.0, atol=PROBABILITY_SUM_ATOL, rtol=0)
     if bad_sums.any():
@@ -147,19 +145,21 @@ def load_evaluation_data(labels_path, predictions_path):
             f"Probability rows must sum to 1 within {PROBABILITY_SUM_ATOL}; invalid lesion: "
             f"{ids[int(np.flatnonzero(bad_sums)[0])]}. Export probabilities, not logits."
         )
-    # 把真实类别名映射成 0～10 的索引，供 scikit-learn 与预测索引进行比较。
-    y_true = np.array([CLASSES.index(row["label"]) for row in labels], dtype=int)
+    y_true = np.array([class_names.index(row["label"]) for row in labels], dtype=int)
     return ids, y_true, probabilities
 
 
-# 输入必须已经过 load_evaluation_data 验证，且真实标签与概率行已对齐。
-# 返回：整体指标、逐类指标、数量矩阵、归一化矩阵和预测类别索引。
-def calculate_metrics(y_true, probabilities):
+def calculate_metrics(y_true, probabilities, *, class_names=CLASSES):
     """Calculate metrics from validated arrays returned by load_evaluation_data."""
+    class_names = validate_class_order(class_names)
+    y_true, probabilities = np.asarray(y_true), np.asarray(probabilities)
+    if y_true.ndim != 1 or not len(y_true) or probabilities.shape != (len(y_true), len(class_names)):
+        raise ValueError("Label/probability dimensions do not match the class schema")
+    if not np.issubdtype(y_true.dtype, np.integer) or np.any(y_true < 0) or np.any(y_true >= len(class_names)):
+        raise ValueError("Invalid class indices for this schema")
     # 每行取最大概率所在的列作为预测类别；最高值完全并列时取最靠前的类别。
     y_pred = probabilities.argmax(axis=1)
-    # 显式指定全部 11 类，使某类即使没有样本，也保留在指标和矩阵中。
-    indices = np.arange(len(CLASSES))
+    indices = np.arange(len(class_names))
     # 对每类分别计算：Precision=TP/(TP+FP)，Recall=TP/(TP+FN)，F1=2TP/(2TP+FP+FN)。
     # TP 是该类预测正确数；FP 是其他类被误判为该类的数量；FN 是该类被错分的数量。
     # support 是真实样本数；zero_division=0 规定分母为零时相应指标记作 0。
@@ -168,7 +168,7 @@ def calculate_metrics(y_true, probabilities):
     )
     # matrix[i, j] 表示真实类别 i 被预测为类别 j 的数量，对角线是正确预测。
     matrix = confusion_matrix(y_true, y_pred, labels=indices)
-    # support[:, None] 把长度 11 的数组变成 11×1，以便每行除以对应真实样本数。
+    # support[:, None] 把长度 C 的数组变成 C×1，以便每行除以对应真实样本数。
     # 零样本行保留为 0，避免除零；绘图时会把该行标成 n/a。
     normalized = np.divide(
         matrix, support[:, None], out=np.zeros_like(matrix, dtype=float),
@@ -180,9 +180,9 @@ def calculate_metrics(y_true, probabilities):
         {"class": c, "precision": float(precision[i]), "recall": float(recall[i]),
          "f1": float(f1[i]), "support": int(support[i]),
          "predicted_count": int(matrix[:, i].sum())}
-        for i, c in enumerate(CLASSES)
+        for i, c in enumerate(class_names)
     ]
-    # 所有指标均为 0～1 的数值。Accuracy 对样本计数，Macro 对 11 个类别等权平均。
+    # 所有指标均为 0～1 的数值。Accuracy 对样本计数，Macro 对 所选类别等权平均。
     # Macro F1 是各类 F1 的均值，即使某类缺失，也保留该类的 0 分参与平均。
     aggregate = {
         "accuracy": float(accuracy_score(y_true, y_pred)),
@@ -201,9 +201,8 @@ def write_csv(path, columns, rows):
         writer.writerows(rows)
 
 
-# 把 11×11 矩阵画成热力图。normalized=False 显示数量，True 显示真实类内的百分比。
-# model_name 仅用于图上的说明文字，不会加载模型或影响计算。
-def plot_confusion(matrix, support, path, model_name, *, normalized=False):
+def plot_confusion(matrix, support, path, model_name, *, normalized=False, class_names=CLASSES):
+    class_names = validate_class_order(class_names)
     # 设置画布和留白，为标题、类别名、色条及底部说明留出空间。
     fig, ax = plt.subplots(figsize=(10.5, 9.5))
     fig.subplots_adjust(left=0.13, right=0.89, top=0.83, bottom=0.17)
@@ -213,13 +212,12 @@ def plot_confusion(matrix, support, path, model_name, *, normalized=False):
     # 比例图的颜色范围固定为 0～1；数量图按本次最大格子数量设置范围。
     upper = 1.0 if normalized else max(1, int(matrix.max()))
     rendered = ax.imshow(matrix, cmap="Blues", vmin=0, vmax=upper)
-    ax.set_xticks(range(len(CLASSES)), CLASSES, rotation=45, ha="right")
-    ax.set_yticks(range(len(CLASSES)), CLASSES)
+    ax.set_xticks(range(len(class_names)), class_names, rotation=45, ha="right")
+    ax.set_yticks(range(len(class_names)), class_names)
     ax.set_xlabel("Predicted class", labelpad=12)
     ax.set_ylabel("True class", labelpad=12)
-    # 每格直接写出数字：数量保留整数，比例转成百分比；深色格使用白字便于阅读。
-    for i in range(len(CLASSES)):
-        for j in range(len(CLASSES)):
+    for i in range(len(class_names)):
+        for j in range(len(class_names)):
             value = matrix[i, j]
             if normalized:
                 label = f"{100 * value:.1f}%" if value not in (0, 1) else f"{100 * value:.0f}%"
@@ -257,12 +255,11 @@ def source_record(path):
     return {"path": displayed, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
 
 
-# 对外的完整评估入口：串起数据检查、指标计算、元信息整理和七个结果文件的生成。
-# 也可从其他 Python 代码中调用；返回写入 metrics.json 的整体结果字典。
-def evaluate_files(labels_path, predictions_path, output_dir, *, model_name=None, overwrite=False):
+def evaluate_files(labels_path, predictions_path, output_dir, *, model_name=None, overwrite=False, class_names=CLASSES, id_column="lesion_id"):
+    class_names = validate_class_order(class_names)
     labels_path, predictions_path, output_dir = map(Path, (labels_path, predictions_path, output_dir))
-    ids, y_true, probabilities = load_evaluation_data(labels_path, predictions_path)
-    aggregate, per_class, matrix, normalized, y_pred = calculate_metrics(y_true, probabilities)
+    ids, y_true, probabilities = load_evaluation_data(labels_path, predictions_path, class_names=class_names, id_column=id_column)
+    aggregate, per_class, matrix, normalized, y_pred = calculate_metrics(y_true, probabilities, class_names=class_names)
     model_name = model_name or predictions_path.stem
     # 先比较实际绝对路径，防止输出文件恰好覆盖输入；此保护不受 overwrite 开关影响。
     input_paths = {labels_path.resolve(), predictions_path.resolve()}
@@ -276,13 +273,13 @@ def evaluate_files(labels_path, predictions_path, output_dir, *, model_name=None
             f"Output files already exist: {', '.join(existing)}. "
             "Choose another directory or use --overwrite."
         )
-    # 明确记录缺少真实样本的类别，提醒使用者：宏平均仍包含全部 11 类。
+    # 明确记录缺少真实样本的类别，提醒使用者：宏平均仍包含全部所选类别。
     absent = [row["class"] for row in per_class if row["support"] == 0]
     warnings = []
     if absent:
         warnings.append(
             f"No true examples for {', '.join(absent)}. Undefined per-class metrics are 0; "
-            "Macro F1 still averages all 11 classes. Compare the same label split across runs."
+            f"Macro F1 still averages all {len(class_names)} classes. Compare the same label split across runs."
         )
     # 统计最高概率完全相同的并列预测；分类仍使用前面 argmax 的固定规则。
     maxima = probabilities.max(axis=1, keepdims=True)
@@ -290,10 +287,10 @@ def evaluate_files(labels_path, predictions_path, output_dir, *, model_name=None
     # 结果除了分数，也保存计算规则、数据指纹和环境版本，便于复查与模型间比较。
     summary = {
         "schema_version": 1, "model_name": model_name, "unit": "lesion", "n_lesions": len(ids),
-        "class_order": list(CLASSES), "primary_metric": "macro_f1",
+        "class_order": list(class_names), "primary_metric": "macro_f1",
         "metric_scale": "0 to 1", **aggregate,
         "metric_policy": {
-            "macro_average_classes": "all 11, including classes absent from labels",
+            "macro_average_classes": f"all {len(class_names)}, including classes absent from labels",
             "zero_division": 0, "prediction": "argmax probability",
             "tie_break": "first class in class_order",
             "probability_sum_atol": PROBABILITY_SUM_ATOL,
@@ -306,6 +303,7 @@ def evaluate_files(labels_path, predictions_path, output_dir, *, model_name=None
                         "scikit-learn": sklearn.__version__, "matplotlib": matplotlib.__version__},
     }
     output_dir.mkdir(parents=True, exist_ok=True)
+    # Finish rendering in a temporary directory before publishing any result files.
     # 先在临时目录生成完整表格和图片，生成完成后再逐个移到正式目录。
     # 这样输入/绘图失败时不会先发布半套新结果；此处不改变原始标签或预测 CSV。
     with tempfile.TemporaryDirectory(prefix=".evaluation-", dir=output_dir) as temp:
@@ -318,19 +316,19 @@ def evaluate_files(labels_path, predictions_path, output_dir, *, model_name=None
                   [list(row.values()) for row in per_class])
         for name, values in (("confusion_matrix.csv", matrix),
                              ("confusion_matrix_normalized.csv", normalized)):
-            write_csv(stage / name, ("true_class", *CLASSES),
-                      [[c, *values[i].tolist()] for i, c in enumerate(CLASSES)])
+            write_csv(stage / name, ("true_class", *class_names),
+                      [[c, *values[i].tolist()] for i, c in enumerate(class_names)])
         # 逐条结果按标签文件顺序保存，correct=1 表示预测正确，0 表示错误。
         # 保留全部概率，后续可按病变编号查找误判并回看图片。
         write_csv(stage / "predictions_aligned.csv",
-                  ("lesion_id", "true_label", "predicted_label", "correct", *CLASSES),
-                  [[lesion, CLASSES[y_true[i]], CLASSES[y_pred[i]], int(y_true[i] == y_pred[i]),
+                  (id_column, "true_label", "predicted_label", "correct", *class_names),
+                  [[lesion, class_names[y_true[i]], class_names[y_pred[i]], int(y_true[i] == y_pred[i]),
                     *probabilities[i].tolist()] for i, lesion in enumerate(ids)])
         # 矩阵每行总数就是真实类别的样本量；用同一批结果生成两张图。
         support = matrix.sum(axis=1)
-        plot_confusion(matrix, support, stage / "confusion_matrix.png", model_name)
+        plot_confusion(matrix, support, stage / "confusion_matrix.png", model_name, class_names=class_names)
         plot_confusion(normalized, support, stage / "confusion_matrix_normalized.png",
-                       model_name, normalized=True)
+                       model_name, normalized=True, class_names=class_names)
         # 所有文件生成成功后逐个替换目标文件；离开 with 后临时目录自动清理。
         for name in OUTPUT_FILES:
             (stage / name).replace(output_dir / name)
@@ -340,18 +338,24 @@ def evaluate_files(labels_path, predictions_path, output_dir, *, model_name=None
 # 命令行入口。argv=None 时读取终端参数，也可以传入参数列表供其他代码调用。
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    # 必需参数：模型概率 CSV 和结果目录。可选标签路径默认指向仓库现有验证集。
-    parser.add_argument("--predictions", required=True, type=Path, help="CSV with lesion_id and 11 probability columns")
-    parser.add_argument("--labels", type=Path, default=ROOT / "DATA/PROCESSED_DATA/val_split.csv",
-                        help="True-label CSV; default is the repository validation split")
+    parser.add_argument("--predictions", required=True, type=Path, help="CSV with lesion_id and one probability column per selected class")
+    parser.add_argument("--labels", type=Path,
+                        help="True-label CSV; required except for legacy 11-class lesion_id evaluation")
     parser.add_argument("--output-dir", required=True, type=Path, help="Directory for metrics, tables and figures")
     # model-name 仅标记实验名称；overwrite 表示允许替换已有结果文件。
     parser.add_argument("--model-name", help="Display name stored in metrics and figures; defaults to prediction filename")
     parser.add_argument("--overwrite", action="store_true", help="Replace existing evaluation output files")
+    parser.add_argument("--class-schema", choices=("11", "9", "8"), default="11")
+    parser.add_argument("--id-column", choices=("lesion_id", "sample_id"), default="lesion_id")
     args = parser.parse_args(argv)
+    if args.labels is None:
+        if args.class_schema != "11" or args.id_column != "lesion_id":
+            parser.error("--labels is required for the selected schema / ID column")
+        args.labels = ROOT / "DATA/PROCESSED_DATA/val_split.csv"
     try:
         summary = evaluate_files(args.labels, args.predictions, args.output_dir,
-                                 model_name=args.model_name, overwrite=args.overwrite)
+                                 model_name=args.model_name, overwrite=args.overwrite,
+                                 class_names={"11": CLASSES, "9": NINE_CLASSES, "8": EIGHT_CLASSES}[args.class_schema], id_column=args.id_column)
     # 输入、文件或编码错误统一输出简短说明，并用非零退出码告知运行失败。
     except (OSError, ValueError, csv.Error, UnicodeError) as exc:
         parser.exit(1, f"Evaluation failed: {exc}\n")

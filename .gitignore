@@ -11,3 +11,36 @@
 .venv/
 __pycache__/
 *.pyc
+
+# Local notes, settings, environments, downloads and training outputs.
+[Rr][Ee][Aa][Dd].[Tt][Xx][Tt]
+.vscode/
+.idea/
+.venv-gpu/
+.env
+.env.*
+.pytest_cache/
+configs/local.yaml
+DATA/cache/
+/runs/
+/reports/preparation/
+*.log
+pretrained_weights/
+**/weights/
+**/deps/
+*.pt
+*.pth
+*.safetensors
+*.ckpt
+*.onnx
+*.zip
+*.tar
+*.gz
+**/current_launch.json
+**/external_nine_current.json
+
+# Case-level manifests stay local; A may publish only aggregate evidence.
+/DATA/manifests/*
+!/DATA/manifests/class_counts.csv
+!/DATA/manifests/summary.json
+!/DATA/manifests/version.json
