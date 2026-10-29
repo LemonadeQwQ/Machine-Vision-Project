@@ -1,0 +1,18 @@
+{
+  "schema_version": "resnet9-v1",
+  "class_names": ["AKIEC", "BCC", "BKL", "DF", "INF", "MEL", "NV", "SCCKA", "VASC"],
+  "definitions": {
+    "AKIEC": "Actinic keratosis / intraepidermal carcinoma",
+    "BCC": "Basal cell carcinoma",
+    "BKL": "Benign keratinocytic lesion",
+    "DF": "Dermatofibroma",
+    "INF": "Inflammatory / infectious conditions",
+    "MEL": "Melanoma",
+    "NV": "Melanocytic nevus",
+    "SCCKA": "Squamous cell carcinoma / keratoacanthoma",
+    "VASC": "Vascular lesions / hemorrhage"
+  },
+  "excluded_milk": ["BEN_OTH", "MAL_OTH"],
+  "reference": "https://challenge.isic-archive.com/landing/milk10k/",
+  "note": "Course nine-class protocol; not the official eleven-class leaderboard task."
+}

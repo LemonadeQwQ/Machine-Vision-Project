@@ -1,0 +1,33 @@
+{
+  "files": {
+    "class_counts.csv": "e39f990d97312dea5b2534186648dee272f6b623b1f55e499d6cf55604c91ed2",
+    "exclusions.csv": "c41824d9caa80a53ab560de02c702416fce748673c2e3cd2f3a36a64f64f4691",
+    "folds/fold_0/train.csv": "a583f5a92afaa9601357e0aa543eb8f79979717d3cb2a06f82c6b81c7548d9cd",
+    "folds/fold_0/val.csv": "14e0a4216294a327c6772935d2a60f548c9d1a5747ae29da3fa70042bd81348a",
+    "folds/fold_1/train.csv": "c47dc86a3e3effb5627920e74ea05742af601605fdca3b211fb42ab3a4c397ad",
+    "folds/fold_1/val.csv": "38d7e04114692b664f5d166d7c754950929380c8fe8212259fdd6cf007e61bb6",
+    "folds/fold_2/train.csv": "2def2e5c359aa8c9d1a3b5b529f0687057cd2262599371a0ae11a49e86aef818",
+    "folds/fold_2/val.csv": "dfd11461f7e3d34f1af07218fda3569618ba9fea1c89be8dc3304a4534665134",
+    "folds/fold_3/train.csv": "4e27799113590552da63e5c389cfa8f83cab0e9f564d8fc27713a2c0ee8d2497",
+    "folds/fold_3/val.csv": "1b0c9e31cf14b19586b9554bf68a9163ae020df7974fb26ef67e28fa374b7066",
+    "folds/fold_4/train.csv": "d8c5594503fbcbcf24f5bbd1426d9e8796635f7e4f6dbe75f8ca19bc65e00249",
+    "folds/fold_4/val.csv": "6e5475ce6abd593da74cc000ceb821f95aaf2188b3d0f7fffc1b7cbc9c5f9bfe",
+    "isic_train.csv": "775b7049bf0b5a786a1aa13bd8c372acbf78105204f38edc59cc160cc378139e",
+    "milk_dev.csv": "a9f461e8c41140f4c216f58a91722aa69b06c07575d4dcf4dd75c6d2e54906c7",
+    "milk_holdout.csv": "9e20b0d7a8ec2880952fceb8aeb9663edf7a882a4aaef92c440de787d8d5236c",
+    "summary.json": "eb3dbe897f73cd9e52f2e61e5564563f3f2c9dc9a0bf53b2d28bb9fabc9faf1b"
+  },
+  "protocol": "resnet9-v1",
+  "sources": {
+    "ISIC_2019_Training_GroundTruth.csv": "aa88e9638fe4df9ef330dc4ba22fa4bd475c44af692fffb870c73091ab25cdcd",
+    "ISIC_2019_Training_Metadata.csv": "d93994a8ed201d474de9a7af7e17ec30929cbc4a5220659ecbde17cbe83e9316",
+    "MILK10k_Training_GroundTruth.csv": "82059a9351efbbc74ac028ab221c17a4838dd4ba8cbbaaf79f51ce3a435ea29c",
+    "MILK10k_Training_Metadata.csv": "081c88f274fe560c679b507f4400cc329edd3e28a53437048092fd860dc1cf1c",
+    "MILK10k_Training_Supplement.csv": "14d12d1b8c13d48e0068d70cfaed884b28691394019fb00339c41063bc749b5e",
+    "classes_9.json": "4eb788ed4e3817975ef3c5b157c4bd1194c3d33f2a05722e2d21b20b27a1e26f",
+    "label_mapping.csv": "0f7c22ccdfeb0ebc221c129f4c6b46a7b96cddf2271350667d59285dd667d8ca",
+    "similarity_candidates.csv": "59a3eeee0a5db0f253f4d46518191f9cf094d4d9bc4f187334cce2363380847c",
+    "train_split.csv": "ffca74529e57449cb11e506cfa2fce959bf7d559ff1f97834a0f14b6d2875234",
+    "val_split.csv": "c40b840c94668d8494d06139dca6bd0fa5b6302f45056f6309abfab4b7b76022"
+  }
+}
