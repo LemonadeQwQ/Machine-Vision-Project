@@ -1,0 +1,4 @@
+experiment: E05
+modality: derm
+include_isic: true
+weighted: true

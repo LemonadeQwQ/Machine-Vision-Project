@@ -1,0 +1,4 @@
+experiment: E07
+modality: pair
+weighted: true
+include_isic: true

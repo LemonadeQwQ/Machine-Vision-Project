@@ -1,0 +1,21 @@
+source,source_label,target_label,action,reason,reference
+MILK,AKIEC,AKIEC,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+MILK,BCC,BCC,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+MILK,BEN_OTH,,exclude,Course nine-class protocol excludes heterogeneous other benign,https://challenge.isic-archive.com/landing/milk10k/
+MILK,BKL,BKL,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+MILK,DF,DF,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+MILK,INF,INF,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+MILK,MAL_OTH,,exclude,Course nine-class protocol excludes heterogeneous other malignant,https://challenge.isic-archive.com/landing/milk10k/
+MILK,MEL,MEL,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+MILK,NV,NV,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+MILK,SCCKA,SCCKA,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+MILK,VASC,VASC,keep,Original diagnosis category,https://challenge.isic-archive.com/landing/milk10k/
+ISIC2019,AK,AKIEC,merge,Actinic keratosis is a subset of AKIEC; not identical taxonomies,https://challenge.isic-archive.com/landing/2019/;https://challenge.isic-archive.com/landing/milk10k/
+ISIC2019,BCC,BCC,keep,Same diagnosis family,https://challenge.isic-archive.com/landing/2019/
+ISIC2019,BKL,BKL,merge,ISIC benign keratoses fall within broader MILK BKL,https://challenge.isic-archive.com/landing/2019/;https://challenge.isic-archive.com/landing/milk10k/
+ISIC2019,DF,DF,keep,Same diagnosis family,https://challenge.isic-archive.com/landing/2019/
+ISIC2019,MEL,MEL,keep,Same diagnosis family,https://challenge.isic-archive.com/landing/2019/
+ISIC2019,NV,NV,keep,Same diagnosis family,https://challenge.isic-archive.com/landing/2019/
+ISIC2019,SCC,SCCKA,merge,Squamous cell carcinoma is a subset of SCCKA,https://challenge.isic-archive.com/landing/2019/;https://challenge.isic-archive.com/landing/milk10k/
+ISIC2019,VASC,VASC,merge,ISIC vascular lesions fall within broader MILK vascular group,https://challenge.isic-archive.com/landing/2019/;https://challenge.isic-archive.com/landing/milk10k/
+ISIC2019,UNK,,exclude,Unknown is not INF and is not a course nine-class diagnosis,https://challenge.isic-archive.com/landing/2019/

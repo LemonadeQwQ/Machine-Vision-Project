@@ -1,0 +1,2 @@
+# Preserve frozen manifest bytes so checksums survive a platform change.
+DATA/manifests/** -text

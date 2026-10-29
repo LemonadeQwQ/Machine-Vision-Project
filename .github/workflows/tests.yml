@@ -1,0 +1,44 @@
+name: Offline checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check protocol dependencies
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          required = (
+              'src/data/common.py', 'src/data/manifest.py',
+              'src/data/prepare.py', 'src/data/deduplicate.py',
+              'src/metadata_features.py', 'configs/schema/label_mapping.csv',
+              'src/experiment.py', 'src/models/fusion.py', 'src/losses.py',
+              'configs/experiments/base.yaml', 'configs/schema/pretrained_weights.json',
+          )
+          missing = [name for name in required if not Path(name).is_file()]
+          schema = Path('src/class_schema.py').read_text(encoding='utf-8')
+          if 'NINE_CLASSES' not in schema or 'validate_class_order' not in schema:
+              missing.append('updated src/class_schema.py')
+          if missing:
+              print('::error::Missing protocol dependencies: ' + ', '.join(missing))
+              raise SystemExit(1)
+          PY
+      - name: Install CPU PyTorch
+        run: python -m pip install torch==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cpu
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-test.txt
+      - name: Run protocol and schema checks
+        run: |
+          python -B -m unittest discover -s tests -p test_resnet_protocol.py -v
+          python -B -m unittest discover -s tests -p test_evaluation_schemas.py -v
+          python -B -m unittest discover -s tests -p test_evaluate.py -v
+        env:
+          HF_HUB_OFFLINE: '1'
+          TRANSFORMERS_OFFLINE: '1'
+          PYTHONDONTWRITEBYTECODE: '1'

@@ -1,0 +1,32 @@
+{
+  "counts": {
+    "isic_train": 20279,
+    "milk_dev": 3968,
+    "milk_holdout": 1037
+  },
+  "exclusions": {
+    "conflicting_labels_in_lesion_or_similarity_group": 566,
+    "redundant_exact_image": 37,
+    "schema_exclusion": 53,
+    "similarity_group_touches_fixed_holdout": 182,
+    "similarity_group_touches_milk": 4449
+  },
+  "fixed_holdout": "Original val membership retained after nine-class filtering; related dev candidates excluded",
+  "group_basis": "lesion IDs + exact SHA256 + pHash64 D4 distance <= 4 candidate components",
+  "limitations": [
+    "Patient-level independence cannot be claimed",
+    "Perceptual candidates are not confirmed duplicates",
+    "Historical use means holdout is not a previously unseen external benchmark"
+  ],
+  "patient_id_available": false,
+  "protocol": "resnet9-v1",
+  "similarity_candidates": {
+    "candidate_pairs": 9253,
+    "images": 35811,
+    "limitations": "Conservative candidates, not confirmed same patients. Crops and unrelated close-looking lesions can escape or collide.",
+    "method": "64-bit pHash with eight rotations/reflections",
+    "radius": 4,
+    "signature": "cdca85fb4fe544dad80adf43968ebe0892e6070e453cabb36f4f135423ba3ac1"
+  },
+  "splitter": "StratifiedGroupKFold(n_splits=5,shuffle=True,random_state=42)"
+}
