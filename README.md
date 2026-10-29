@@ -7,12 +7,12 @@ E03–E09 are later controlled comparisons.
 
 ## Delivery status — 2026-10-28
 
-This C-owned branch supplies evaluation, CV summaries, protocol tests, CI and
-public documentation. **A's data/schema delivery and B's training/configuration
-delivery are still pending in public.** The complete nine-class implementation
-has been prepared internally; this branch alone cannot run it. CI reports missing
-dependencies explicitly. Merge the three deliveries and run the checks before
-treating the public integration as complete.
+The A/B/C deliveries are integrated: data preparation and class schemas (A),
+training/models/configuration (B), and evaluation/tests/documentation (C).
+The public code includes the dependencies needed for offline checks. Real-data
+execution still requires locally generated manifests, images and verified
+weights. Integration checks and merge status are recorded in
+[PR #1](https://github.com/LemonadeQwQ/Machine-Vision-Project/pull/1).
 
 Real-data GPU smoke checks and formal training have not started. There are no
 new E00–E09 model-performance results. Historical PanDerm, MONET and Gate results
@@ -51,18 +51,18 @@ to bypass input checks.
 | --- | --- |
 | `src/evaluate.py`, `src/metrics.py` | Fixed-schema evaluation and training metric adapter — C |
 | `scripts/summarize_cv.py`, `scripts/collect_results.py` | Verified OOF summaries and formal-result collection — C |
-| `scripts/check_training_ready.py`, `scripts/check_smoke_run.py` | Input checks and smoke/restart verification — C; require A/B interfaces |
-| `tests/test_resnet_protocol.py`, `tests/test_evaluation_schemas.py` | Artificial-input regression tests — C; require A/B dependencies |
-| `src/data/`, `src/class_schema.py`, `configs/schema/label_mapping.csv` | Data, grouping and class contract — A, pending public delivery |
-| `src/experiment.py`, `src/models/fusion.py`, `configs/experiments/` | New training entry point, models and configurations — B, pending public delivery |
+| `scripts/check_training_ready.py`, `scripts/check_smoke_run.py` | Input checks and smoke/restart verification — C |
+| `tests/test_resnet_protocol.py`, `tests/test_evaluation_schemas.py` | Artificial-input regression tests — C |
+| `src/data/`, `src/class_schema.py`, `configs/schema/label_mapping.csv` | Data, grouping and class contract — A |
+| `src/experiment.py`, `src/models/fusion.py`, `configs/experiments/` | New training entry point, models and configurations — B |
 | `reports/experiments/` | E00–E09 status table; all 50 fold rows remain planned |
 | `DATA/PROCESSED_DATA/`, `src/train.py` | Existing 11-class labels and legacy training entry point |
 | `examples/evaluation/`, `tests/test_evaluate.py` | Existing synthetic demonstration and evaluator compatibility tests |
 
 Read the [experiment plan](docs/experiment_plan.md),
 [contribution record](docs/contributions.md), and
-[evaluation contract](docs/evaluation.md). A's `docs/data_protocol.md` and B's
-`docs/training.md` are pending delivery; link them here when those files land.
+[evaluation contract](docs/evaluation.md), [data protocol](docs/data_protocol.md),
+and [training guide](docs/training.md).
 Cluster environment setup and job submission are maintained internally.
 
 ## Offline setup and checks
@@ -77,7 +77,7 @@ python -m pip install torch==2.7.1 torchvision==0.22.1 --index-url https://downl
 python -m pip install -r requirements-test.txt
 ```
 
-After A/B dependencies have been integrated, run:
+Run the three offline suites (19 protocol, 4 schema and 12 legacy checks):
 
 ```powershell
 python -B -m unittest discover -s tests -p test_resnet_protocol.py -v

@@ -2,7 +2,7 @@
 
 更新日期：2026-10-28。实现、运行与整理由集成人统一完成，AI 协助。A／B／C 是组员接收代码、复核和提交 public 的责任范围，不是三套独立项目，也不代表这些实现已经分别由三位组员独立完成。
 
-本 public 分支由 C 发起交付，Codex 协助整理、适配和验证。A／B 的新依赖尚未进入 public；下表的 implemented 指完整内部版本的实现状态，不表示 C 独立完成或本分支包含 A／B 的文件。人工交叉复核仍须由组员实际完成。
+public 已整合三位各自分支的交付，保留 A `ccb78a3`、B `7302c20`、C `b3e15a7` 的提交记录。C 授权本次合并，Codex 协助依赖核对、公开文档适配和自动检查。分支合并和测试不代表组员已完成人工交叉复核；下表据实保留 pending。
 
 ## 状态定义
 
@@ -21,11 +21,11 @@
 | Nibi 部署与新流程真实 GPU 短检 | 集成人后续执行，B 记录 | planned | 脚本已准备；当前没有新流程 GPU 验证结果 | pending |
 | E00／E01／E02 核心 15 折及正式指标 | 集成人后续执行 | planned | 尚无本轮真实训练成绩 | pending |
 | E03～E09、最终 refit 与 holdout 评估 | 集成人后续执行 | planned | 接口和配置提前实现，实验尚未运行 | pending |
-| public 领取、合并与远程 CI | A／B／C | in progress | C 的 19 个路径在本分支交付；A／B 待接入；CI 显式检查缺失依赖 | pending：三组齐全并通过整合检查后合并 |
+| public 交付与整合 | A／B／C | implemented | A 17、B 24、C 19 个路径已整合；远程 CI 与合并记录见 [PR #1](https://github.com/LemonadeQwQ/Machine-Vision-Project/pull/1) | pending：组员人工交叉复核另行记录 |
 
-## C 本次交付的验证
+## 验证范围与记录
 
-基于 public 原有文件、C 本次改动及临时加入的 A／B 依赖，在本地 CPU 环境完成 35 项检查：`test_resnet_protocol.py` 19 项、`test_evaluation_schemas.py` 4 项、原有 `test_evaluate.py` 12 项，全部通过。临时依赖仅用于验证，没有加入 C 分支。该结果不是缺少 A／B 的 C 分支独立通过，也不是远程 CI 或 GPU 验证。
+C 单独交付时，曾临时加入 A／B 依赖验证 35 项测试；该记录只是当时的整合预览。本次正式接入 A／B 分支后，直接在 public 整合工作区运行相同三组检查：`test_resnet_protocol.py` 19 项、`test_evaluation_schemas.py` 4 项、原有 `test_evaluate.py` 12 项，本地全部通过。远程 CI 结果及合并状态以 [整合 PR](https://github.com/LemonadeQwQ/Machine-Vision-Project/pull/1) 的记录为准，不能把它当成真实 GPU 训练验证。
 
 C 公开版保留旧 11 类评估的默认标签位置；新 schema 或 `sample_id` 必须显式指定标签文件，并增加两项回归测试。历史回放工具改为显式提供 archive／labels。README、评估说明、CI 和忽略规则按公开范围适配，不发布内部部署材料、逐病例新清单或训练结果。
 

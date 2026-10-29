@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Require the A and B protocol dependencies
+      - name: Check protocol dependencies
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -26,7 +26,7 @@ jobs:
           if 'NINE_CLASSES' not in schema or 'validate_class_order' not in schema:
               missing.append('updated src/class_schema.py')
           if missing:
-              print('::error::A/B protocol delivery is pending; C integration cannot pass yet: ' + ', '.join(missing))
+              print('::error::Missing protocol dependencies: ' + ', '.join(missing))
               raise SystemExit(1)
           PY
       - name: Install CPU PyTorch

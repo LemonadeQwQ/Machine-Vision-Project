@@ -1,6 +1,6 @@
-# 新 ResNet 训练与集群操作
+# ResNet 九类训练协议
 
-本页命令供**获准上传之后**使用；此次准备没有执行上传或训练。当前准备状态见 [local_preparation.md](local_preparation.md)。
+本页记录已整合到 public 的模型、运行入口和实验规则。代码交付不代表真实 GPU 短检、正式训练或最终评估已经完成。
 
 ## 模型和实验
 
@@ -23,57 +23,126 @@
 
 AdamW：骨干学习率 1e-5、分类头 1e-4、weight decay 1e-4、梯度范数上限 5。默认 batch 32、BF16、channels_last、TF32、4 个 worker、每 worker 预取 2 个 batch。候选上限 100 epoch，验证 Macro F1 连续 15 轮不提升则停止；相同分数保留较早 epoch。加权实验使用训练折 `w=(1/n)/mean(1/n)`，零计数拒绝。全部配置在 `configs/experiments/`；性能参数需集群真实短检后才能定为最终值。
 
-## 上传后的目录
+## 运行环境和输入
 
-集群根目录 `/project/def-ajbonner/yuchenx4/csc490`：代码在 `Vision_Project/`，原始文件在 `data/`，权重在 `pretrained/resnet50-11ad3fa6.pth`，结果在 `results/`。不要上传 Windows 虚拟环境或 `read.txt`。
+真实训练仅在获准的 Nibi GPU 作业中执行；本页给出通用 Python 入口。
+环境安装、数据暂存、资源申请和 Slurm 提交由集成人在内部集群脚本维护，
+不属于 public 仓库。当前没有新流程的 GPU 短检或正式训练结果。
 
-`data/` 保持本机 DATASETS 的相对结构。核心需要 MILK Training ZIP、标签、元数据和审计清单；ISIC 扩充需要 ISIC Training ZIP、标签和元数据。官方 Test 文件留作独立资料，不作为本轮输入。`stage_data.sh` 在计算节点把所需 ZIP 展开至 `$SLURM_TMPDIR`，减少共享文件系统的小文件读取；结果和 checkpoint 写 project，作业结束不会随临时盘一起丢失。
+训练环境需匹配的 PyTorch／torchvision，以及 `requirements-train.txt` 中的依赖。
+原图、权重、环境和逐病例清单不进入 public。数据准备见 [数据协议](data_protocol.md)，
+公开 CI 只使用人工输入。
 
-## 先验证，再提交核心队列
-
-以下均在集群仓库目录运行：
-
-```bash
-sbatch hpc/nibi/install_protocol.sbatch
-# 上一项成功后，运行真实图片短检查（E00/E01/E02/E07/E08）。
-sbatch hpc/nibi/smoke_resnet.sbatch
-```
-
-短检查按来源、类别和模态可用性分别选取少量真实图片；E07 包含 MILK 双图和 ISIC 缺失临床图样本，验证侧始终只含 MILK。每个配置预定两轮：第一轮保存后进程退出，检查部分完成记录；第二个进程从 `last.pt` 恢复到第二轮，再重新加载 `best.pt` 推理。`check_smoke_run.py` 核验样本覆盖、每轮洗牌顺序、恢复起点和读回预测一致性，之后进行完整折验证集推理。产物位于独立 `results/smoke-JOB_ID`，始终标为 smoke，不能进入正式结果表。
-
-检查 CUDA、显存余量、数据读取速度及 checkpoint。`smoke_train.csv`、`smoke_val.csv` 和 `smoke_*_verification.json` 保存短检覆盖与恢复证据。单独使用 `--smoke` 仍默认一轮；两轮停止／恢复参数仅允许用于 smoke。默认请求 Nibi 已验证可用的 10 GB H100 MIG 类型，但新模型的显存和时间尚未实测。需要更大分片／完整卡或调整 batch 时，先改配置并记录版本，再开始正式 CV。
-
-验证通过后再执行：
+以下 Bash 变量都是用户环境中的占位路径，执行前换成实际位置：
 
 ```bash
-export CSC490_RUN_NAME=resnet9_v1_run01
-sbatch hpc/nibi/train_array.sbatch
+PROJECT_ROOT=/path/to/Vision_Project
+DATA_ROOT=/path/to/datasets
+WEIGHTS="$PROJECT_ROOT/pretrained_weights/resnet50-11ad3fa6.pth"
+MANIFESTS="$PROJECT_ROOT/DATA/manifests"
+RUN_ROOT=/path/to/results/resnet9_v1_run01
+cd "$PROJECT_ROOT"
 ```
 
-任务 0～4 为 E00，5～9 为 E01，10～14 为 E02；每任务单 GPU，最多并发两折。并发和 GPU 类型可经实测后调整。脚本不会自动提交对照实验。单折／E03～E09 使用 `train_one.sbatch`，设置 `CSC490_CONFIG`、`CSC490_FOLD`、`CSC490_RUN_NAME`。
+数据目录保持官方输入的相对结构；固定清单需在本地生成并核对 `version.json`。
+ImageNet V2 权重校验信息位于 `configs/schema/pretrained_weights.json`。
+结果保存到持久存储。计算节点使用临时数据目录时可设置 `CSC490_DATA_ROOT`；
+代码指纹以实际运行目录重新计算，不能沿用另一 checkout 的字节指纹。
 
-关 PuTTY 不会停止 Slurm 训练。需要停止时在集群对具体作业使用 `scancel JOB_ID`。中断后保留最后完整 epoch 的 `last.pt`；不能恢复被打断 epoch 中途的 batch。确认无同目录作业后移除残留 `.running` 标记，并设置 `CSC490_RESUME=1` 重新提交对应任务。洗牌随机数独立于 worker 初始化，每轮按 seed 加 epoch 索引重置；样本增强仍由 seed、epoch 和样本索引确定。恢复校验配置、代码和清单指纹，任何变化都会拒绝；不能把仅加载权重当恢复。加速选项可能造成 GPU 浮点差异，不承诺 GPU 或跨设备逐位一致。
+## 输入检查与真实 GPU 短检
 
-## 预测、汇总和最后的固定验证
-
-每折保存 `run.json`、`config.json`、`metadata.json`、`history.json`、`best.pt`、`last.pt`、`predictions.csv` 和统一 `evaluation/`。模型选择看折验证 Macro F1，因此 CV 是开发选模估计。
+准备好真实输入和权重后，单折只检查输入、不创建模型的入口是：
 
 ```bash
-python scripts/summarize_cv.py --runs "$CSC490_ROOT/results/$CSC490_RUN_NAME/E00" \
-  --output "$CSC490_ROOT/results/$CSC490_RUN_NAME/E00/summary"
-python scripts/collect_results.py --runs "$CSC490_ROOT/results/$CSC490_RUN_NAME" \
-  --output "$CSC490_ROOT/results/$CSC490_RUN_NAME/experiment_status.csv"
+python -m src.experiment --config configs/experiments/E00_derm.yaml --fold 0 \
+  --data-root "$DATA_ROOT" --weights "$WEIGHTS" --manifests "$MANIFESTS" \
+  --output "$RUN_ROOT/E00/fold_0" --preflight-only
 ```
 
-汇总只接受同配置／代码／数据、全部五折完成、完整 OOF 的正式结果。逐折均值及样本标准差与 pooled OOF 分开报告；smoke 和缺折不能冒充 completed CV。
+正式训练前，对 E00／E01／E02／E07／E08 分别做真实图片短检。
+短检按来源、类别和模态可用性选少量样本；E07 必须覆盖 MILK 双图和
+ISIC 缺临床图，验证侧始终只含 MILK。每个配置预定两轮：
 
-最终 refit 轮数预先规定为五折 best epoch 的中位数，不用 holdout 选轮数。设置 `CSC490_CV_SUMMARY` 和 `CSC490_REFIT_OUTPUT`，提交 `hpc/nibi/refit.sbatch`。完成后再在 GPU 作业中用 `src.infer` 推理固定 holdout：
+1. 在独立输出目录运行 `src.experiment`，加上
+   `--smoke --smoke-epochs 2 --smoke-stop-after-epoch 1`。
+2. 运行 `scripts/check_smoke_run.py --run SMOKE_DIR --expect stopped`，
+   核验首轮 checkpoint、覆盖情况和样本顺序。
+3. 以相同配置和目录重新启动，使用 `--smoke --smoke-epochs 2 --resume`，
+   去掉停止参数，从 `last.pt` 恢复到第二轮。
+4. 用 `src.infer` 从 `best.pt` 对 `SMOKE_DIR/smoke_val.csv` 重新导出
+   `SMOKE_DIR/reloaded_predictions.csv`，再运行
+   `scripts/check_smoke_run.py --run SMOKE_DIR --expect completed`。
+   此后再核对完整折验证集的推理。
+
+`smoke_train.csv`、`smoke_val.csv` 和 `smoke_*_verification.json` 保留覆盖及恢复证据。
+smoke 产物必须使用独立目录，不进入正式结果表。普通 `--smoke` 默认只运行一轮。
+
+检查 CUDA、显存余量、吞吐、数据读取、缺失模态、checkpoint 和预测读回。
+当前 batch、worker 数、精度和并发设置都是待测候选；必要调整在正式 CV 前记录并冻结。
+集群旧环境的前向自检不能替代本轮验证。
+
+## 核心五折与恢复
+
+通过真实短检并冻结设置后，在获准的 GPU 作业中运行核心实验。
+单实验顺序五折入口如下；每次各运行五折，共 15 折：
 
 ```bash
-python -m src.infer --checkpoint REFIT_DIR/best.pt --manifest DATA/manifests/milk_holdout.csv \
-  --data-root "$CSC490_ROOT/data" --output REFIT_DIR/holdout_predictions.csv
-python -m src.evaluate --class-schema 9 --id-column sample_id --labels DATA/manifests/milk_holdout.csv \
-  --predictions REFIT_DIR/holdout_predictions.csv --output-dir REFIT_DIR/holdout_evaluation
+python -m src.cross_validate --config configs/experiments/E00_derm.yaml \
+  --data-root "$DATA_ROOT" --weights "$WEIGHTS" --output "$RUN_ROOT/E00"
+python -m src.cross_validate --config configs/experiments/E01_clinical.yaml \
+  --data-root "$DATA_ROOT" --weights "$WEIGHTS" --output "$RUN_ROOT/E01"
+python -m src.cross_validate --config configs/experiments/E02_pair.yaml \
+  --data-root "$DATA_ROOT" --weights "$WEIGHTS" --output "$RUN_ROOT/E02"
 ```
 
-holdout 推理拒绝未完成的 refit 或普通 fold 检查点。结果只用于最终报告，不回头调参。各实际阶段完成多少，就记录多少。
+集群并行调度使用内部脚本，单折 Python 入口为 `src.experiment --config CONFIG --fold FOLD --output OUTPUT`，
+同时传入正确的输入路径。E03～E09 是后续对照，不是启动核心任务的前置阶段。
+
+中断后用相同单折命令和 `--resume` 恢复最后完整 epoch 的 `last.pt`，
+不能恢复被打断 epoch 中途的 batch。若留下 `.running` 标记，先确认原作业已退出，
+再处理对应目录的标记。不要对仍运行的作业解除锁。
+
+洗牌随机数独立于 worker 初始化，每轮按 seed 加 epoch 索引重置；
+样本增强由 seed、epoch 和样本索引确定。恢复校验配置、代码和清单指纹，
+发生变化会拒绝；仅加载模型权重不等于恢复。GPU 加速和跨设备浮点差异
+不保证逐位一致。
+
+## 预测、汇总和最终 refit
+
+每折保存 `run.json`、`config.json`、`metadata.json`、`history.json`、
+`best.pt`、`last.pt`、`predictions.csv` 和统一 `evaluation/`。
+模型选择使用折验证 Macro F1，因此 CV 是开发选模估计。
+
+```bash
+python scripts/summarize_cv.py --runs "$RUN_ROOT/E00" --manifests "$MANIFESTS" \
+  --output "$RUN_ROOT/E00/summary"
+python scripts/collect_results.py --runs "$RUN_ROOT" \
+  --output "$RUN_ROOT/experiment_status.csv"
+```
+
+汇总只接受同配置／代码／数据、全部五折完成、完整 OOF 的正式结果。
+逐折均值、样本标准差和 pooled OOF 分开报告。smoke 和缺折不能冒充 completed CV。
+评估格式见 [统一评估](evaluation.md)。
+
+最终 refit 的轮数预先规定为五折 best epoch 的中位数，不用 holdout 选轮数：
+
+```bash
+python -m src.refit --cv-summary "$RUN_ROOT/E00/summary/cv_summary.json" \
+  --output "$RUN_ROOT/E00/refit"
+```
+
+refit 复用 CV summary 中冻结的配置，恢复时传 `--resume`。
+完成后才在 GPU 作业中推理并评估固定 holdout：
+
+```bash
+python -m src.infer --checkpoint "$RUN_ROOT/E00/refit/best.pt" \
+  --manifest "$MANIFESTS/milk_holdout.csv" --data-root "$DATA_ROOT" \
+  --output "$RUN_ROOT/E00/refit/holdout_predictions.csv"
+python -m src.evaluate --class-schema 9 --id-column sample_id \
+  --labels "$MANIFESTS/milk_holdout.csv" \
+  --predictions "$RUN_ROOT/E00/refit/holdout_predictions.csv" \
+  --output-dir "$RUN_ROOT/E00/refit/holdout_evaluation"
+```
+
+holdout 推理拒绝未完成的 refit 或普通 fold 检查点。结果只用于最终报告，
+不回头调参。各实际阶段完成多少，就记录多少；public 合并不表示这些命令已运行。

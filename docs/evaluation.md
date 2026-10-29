@@ -2,8 +2,8 @@
 
 The current ResNet protocol uses nine classes and `sample_id`. Select both
 explicitly and supply the actual fold manifest, generated locally and excluded
-from the public case-level data delivery. This C branch requires A's updated
-class schema; CV and smoke tools also require A/B's data and training modules.
+from the public case-level data delivery. The updated class schema, data and
+training dependencies are included in the integrated A/B/C public code.
 
 ## Install and run
 

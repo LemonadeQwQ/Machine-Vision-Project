@@ -1,6 +1,6 @@
 # ResNet 九类实验计划
 
-更新日期：2026-10-28。完整实现的内部代码、数据准备和离线验收已完成；本 public 分支仅交付 C 的范围，A／B 的数据与训练依赖尚待接入。真实数据 GPU 短检、正式训练和模型效果评估均未开始。PanDerm、MONET、Gate 的记录是历史实验，不能填入本表。
+更新日期：2026-10-28。内部数据准备和离线验收已完成；public 已整合 A／B／C 的数据、训练、评估和测试代码。真实数据 GPU 短检、正式训练和模型效果评估均未开始。PanDerm、MONET、Gate 的记录是历史实验，不能填入本表。
 
 ## 28 日的完成边界
 
@@ -18,7 +18,7 @@
 
 ## 实验矩阵
 
-完整版本的配置位于 `configs/experiments/`，由 B 提交 public；下表为内部实现状态，全部为 implemented / training planned，不表示本 C 分支已包含全部配置。
+所有实验配置已由 B 交付并整合在 `configs/experiments/`；下表全部为 implemented / training planned，不能把接口实现当成训练完成。
 
 | 编号 | 问题与配置 | 对照及主要变化 | 数据与优先级 |
 |---|---|---|---|
@@ -53,4 +53,4 @@ AdamW 骨干学习率 1e-5、头部 1e-4、weight decay 1e-4；每折最多 100 
 
 ## 后续顺序
 
-用户授权后部署 Nibi → 新版本离线检查 → E00／E01／E02／E07／E08 真实 GPU 短检与恢复验证 → 冻结资源设置 → 启动核心 15 折 → 五折汇总 → 按规则 refit → 固定 holdout 最终评估。运行说明 `docs/training.md` 由 B 交付，数据说明 `docs/data_protocol.md` 由 A 交付；本分支暂不提供尚不存在的文档链接。
+用户授权后部署 Nibi → 新版本离线检查 → E00／E01／E02／E07／E08 真实 GPU 短检与恢复验证 → 冻结资源设置 → 启动核心 15 折 → 五折汇总 → 按规则 refit → 固定 holdout 最终评估。参见 [训练说明](training.md) 和 [数据协议](data_protocol.md)。本次 public 合并不执行集群操作。

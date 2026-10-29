@@ -1,4 +1,4 @@
-"""顺序运行单实验五折；Nibi 正式多折并行使用 hpc/nibi/train_array.sbatch。"""
+"""顺序运行单实验五折；集群并行调度由内部作业脚本维护。"""
 import argparse
 import json
 from pathlib import Path
