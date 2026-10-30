@@ -1,6 +1,6 @@
 # ResNet 九类开发集五折协议
 
-当前入口为 `src/experiment.py`、`src/cross_validate.py`、`src/infer.py` 和 `scripts/summarize_cv.py`。仅在 **3,968 例 MILK 开发集**分五折，固定 holdout **1,037 例**不参与分折或选模。旧 train＋val 合并、最后一轮选模等说明已原样保存在 [历史协议](history/cross_validation_legacy_20261028.md)，不用于本轮。
+当前入口为 `src/experiment.py`、`src/cross_validate.py`、`src/infer.py` 和 `scripts/summarize_cv.py`。仅在 **3,968 例 MILK 开发集**分五折，固定 holdout **1,037 例**不参与分折或选模。旧 train＋val 合并、最后一轮选模属于历史协议，不用于本轮；历史说明由内部项目保留。
 
 ## 输入与独立训练
 
@@ -8,7 +8,7 @@
 
 E00／E01／E02 使用相同 MILK 病例。ISIC 只进入相应对照的训练侧。各折独立创建模型、优化器及训练侧拟合统计，不继承上一折 checkpoint。
 
-`src.experiment` 运行单折，`src.cross_validate` 顺序运行五折；集群数组将 E00、E01、E02 分别映射为任务 0～4、5～9、10～14。正式训练只在分配的 Nibi GPU 上执行，资源见 [计算计划](compute_plan.md)。
+`src.experiment` 运行单折，`src.cross_validate` 顺序运行五折，通用命令见 [训练说明](training.md)。集群资源申请和并行调度由集成人在内部脚本维护。正式训练只在分配的 Nibi GPU 上执行，资源见 [计算计划](compute_plan.md)。
 
 ## 选模与汇总
 

@@ -2,7 +2,7 @@
 
 更新日期：2026-10-29。E00／E01／E02 共 15 折及三组汇总已完成；30 个 checkpoint 审计、15 个最佳模型的完整验证折重推理均通过，概率最大绝对差为 0。E03～E09、refit 和固定 holdout 评估尚未执行。真实指标见 [核心摘要](../reports/experiments/20261029_core/SUMMARY.md)。PanDerm、MONET、Gate 的记录是历史实验，不能填入本表。
 
-本 C 分支只交付聚合结果和公共说明。29 日 A 的数据验收分支已上传待合并，B 的 cuDNN 修复及训练说明待提交；28 日 public 基础代码已整合。训练实际设置与公开源码接收状态必须分开，不能把结果发布视为 29 日三方最终整合完成。
+本版本已接入 29 日 A 的数据验收、B 的 cuDNN 修复与训练说明、C 的聚合结果及公共文档，保留三方原始提交。训练快照与后来的公开交付版本分别记录；人工交叉复核仍需组员实际完成。
 
 ## 28 日的完成边界
 
@@ -43,7 +43,7 @@
 
 AdamW 骨干学习率 1e-5、头部 1e-4、weight decay 1e-4；每折最多 100 epoch。以折验证 Macro F1 选最佳模型，同分保留较早 epoch，连续 15 轮不提升则停止。核心实验采用普通 CE。加权实验仅根据该折训练样本计算 `(1/n_c) / mean(1/n_c)`。
 
-本次实际训练使用 batch 32、4 workers、BF16、channels_last、TF32、H100 MIG 1g.10gb，最多两折并发；cuDNN 为 benchmark=False、deterministic=True。这些设置已在 Nibi 真实输入上检查并用于全部核心折，不能在同一五折中途混用配置。可公开的设置、源码／清单／预训练权重哈希和验收摘要见 [public_summary.json](../reports/experiments/20261029_core/public_summary.json)。B 的公开 cuDNN 修复尚待接入，本段描述实际训练快照。
+本次实际训练使用 batch 32、4 workers、BF16、channels_last、TF32、H100 MIG 1g.10gb，最多两折并发；cuDNN 为 benchmark=False、deterministic=True。这些设置已在 Nibi 真实输入上检查并用于全部核心折，不能在同一五折中途混用配置。可公开的设置、源码／清单／预训练权重哈希和验收摘要见 [public_summary.json](../reports/experiments/20261029_core/public_summary.json)。B 的 cuDNN 修复已接入；本段描述实际训练快照，公开版特有适配不改变原始来源记录。
 
 ## 指标、CV 与最终 refit
 
@@ -55,4 +55,4 @@ AdamW 骨干学习率 1e-5、头部 1e-4、weight decay 1e-4；每折最多 100 
 
 ## 后续顺序
 
-部署、真实 GPU 短检、资源冻结、核心 15 折和五折汇总已完成。下一步推进 E03／E04 及其余对照、报告与复现资料，再按既定规则处理 refit 和固定 holdout。当前核心配置预定 refit 轮数为 E00＝39、E01＝32、E02＝20，这是五折 best epoch 的中位数，不表示已执行。public 先接收 A／B／C 的增量并完成最终整合；参见 [训练说明](training.md) 和 [数据协议](data_protocol.md)，B 的训练文档更新待接入。
+部署、真实 GPU 短检、资源冻结、核心 15 折和五折汇总已完成。下一步推进 E03／E04 及其余对照、报告与复现资料，再按既定规则处理 refit 和固定 holdout。当前核心配置预定 refit 轮数为 E00＝39、E01＝32、E02＝20，这是五折 best epoch 的中位数，不表示已执行。本版本已整合 A／B／C 的增量；运行与数据说明见 [训练说明](training.md)、[模型选择](model_selection.md) 和 [数据协议](data_protocol.md)。

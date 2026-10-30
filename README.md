@@ -32,14 +32,14 @@ These are development model-selection estimates, not holdout results or a
 significance test. Historical PanDerm, MONET and Gate results, label-distribution
 reports and the synthetic evaluation demonstration remain separate.
 
-This C branch publishes the aggregate results and documentation. A's October 29
-data acceptance is uploaded on `feat/a-1029-data-acceptance` (`0bacf4a`) but is not
-yet in the main baseline used here. B's October 29 cuDNN replay fix and updated
-training/selection guides are still pending. The trained snapshot used
-`cudnn.benchmark=False` and `cudnn.deterministic=True`; this results-only branch
-does not yet include that training-code change. Integrate B's delivery before
-claiming the public training source matches the audited run. See the
-[contribution record](docs/contributions.md) for delivery and review boundaries.
+This version integrates A's data acceptance (`0bacf4a`), B's cuDNN replay fix
+and training/selection guides (`ccc10bd`), and C's aggregate results (`df34478`).
+The original commits and authors are retained. The training entry point now uses
+`cudnn.benchmark=False` and `cudnn.deterministic=True`, matching the audited
+algorithm-selection settings. Public-specific evaluation behavior remains intact;
+the original training snapshot is still identified by its recorded fingerprints.
+See the [contribution record](docs/contributions.md) for delivery and manual
+review boundaries.
 
 ## Experiment and data protocol
 
@@ -85,8 +85,9 @@ Read the [experiment plan](docs/experiment_plan.md),
 [contribution record](docs/contributions.md), and
 [evaluation contract](docs/evaluation.md), [data protocol](docs/data_protocol.md),
 and [training guide](docs/training.md). The [result format](docs/results_format.md)
-distinguishes internal run artifacts from the public aggregates; B's pending
-delivery will update the training guide with the validated October 29 settings.
+distinguishes internal run artifacts from the public aggregates. The training
+guide, [CV protocol](docs/cross_validation.md), [model selection rules](docs/model_selection.md)
+and [compute plan](docs/compute_plan.md) describe the validated October 29 run.
 Cluster environment setup and job submission are maintained internally.
 
 ## Offline setup and checks
@@ -153,5 +154,5 @@ python src/analyze_class_distribution.py
 
 The core deployment, GPU checks and 15-fold training are complete. Next steps are
 the remaining controlled comparisons and, under the recorded selection rules,
-final refit followed by fixed holdout evaluation. Public integration and member
-manual review of the October 29 deliveries are still pending.
+final refit followed by fixed holdout evaluation. The October 29 deliveries are integrated in this version; member manual
+review remains separately recorded and is not inferred from automated checks.
