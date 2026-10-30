@@ -1,0 +1,143 @@
+{
+  "class_order": [
+    "AKIEC",
+    "BCC",
+    "BKL",
+    "DF",
+    "INF",
+    "MEL",
+    "NV",
+    "SCCKA",
+    "VASC"
+  ],
+  "completed_folds": 15,
+  "date": "2026-10-29",
+  "holdout_evaluated": false,
+  "limitations": [
+    "CV selects epochs on the fold validation data; these are development selection estimates.",
+    "Differences in mean scores are not a significance test.",
+    "No patient IDs; grouping is by lesion and conservative image-similarity components.",
+    "Fixed holdout has historical exposure and is not a never-seen external benchmark."
+  ],
+  "manifest_sha256": "0ee819e4fcc825834f2c99b906ac3c3f4effe7211280d544fd85ed72382a141c",
+  "protocol": "resnet9-v1",
+  "refit_status": "planned",
+  "results": [
+    {
+      "experiment": "E00",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6633205028417966,
+          "sample_std": 0.028514276210379233
+        },
+        "macro_f1": {
+          "mean": 0.48072469082791763,
+          "sample_std": 0.04229310067885531
+        },
+        "macro_precision": {
+          "mean": 0.5058409123416955,
+          "sample_std": 0.04986092095426635
+        },
+        "macro_recall": {
+          "mean": 0.47510511435043357,
+          "sample_std": 0.046741731126063404
+        }
+      },
+      "n_oof": 3968,
+      "pooled_oof_metrics": {
+        "accuracy": 0.6633064516129032,
+        "macro_f1": 0.4881458561371141,
+        "macro_precision": 0.5108696546903653,
+        "macro_recall": 0.474801297615507
+      },
+      "prescribed_refit_epochs": 39
+    },
+    {
+      "experiment": "E01",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6295406708002724,
+          "sample_std": 0.029993044363533065
+        },
+        "macro_f1": {
+          "mean": 0.3834662516579597,
+          "sample_std": 0.038143615708886164
+        },
+        "macro_precision": {
+          "mean": 0.41803783029965735,
+          "sample_std": 0.06463114168792528
+        },
+        "macro_recall": {
+          "mean": 0.37295595573252954,
+          "sample_std": 0.03038503552947598
+        }
+      },
+      "n_oof": 3968,
+      "pooled_oof_metrics": {
+        "accuracy": 0.6295362903225806,
+        "macro_f1": 0.392307676434287,
+        "macro_precision": 0.4309468937820206,
+        "macro_recall": 0.3727759563300498
+      },
+      "prescribed_refit_epochs": 32
+    },
+    {
+      "experiment": "E02",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6895214601233217,
+          "sample_std": 0.011762602086340106
+        },
+        "macro_f1": {
+          "mean": 0.496281681728299,
+          "sample_std": 0.02390236451390934
+        },
+        "macro_precision": {
+          "mean": 0.5543246114658791,
+          "sample_std": 0.04601935190093866
+        },
+        "macro_recall": {
+          "mean": 0.46866668965600117,
+          "sample_std": 0.015346097743532875
+        }
+      },
+      "n_oof": 3968,
+      "pooled_oof_metrics": {
+        "accuracy": 0.6895161290322581,
+        "macro_f1": 0.499294067559742,
+        "macro_precision": 0.5510751724103862,
+        "macro_recall": 0.4689072110884002
+      },
+      "prescribed_refit_epochs": 20
+    }
+  ],
+  "run_name": "20261029_resnet9_core_v1",
+  "settings": {
+    "amp": "bf16",
+    "batch_size": 32,
+    "channels_last": true,
+    "concurrent_folds": 2,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "device": "NVIDIA H100 MIG 1g.10gb",
+    "max_epochs": 100,
+    "patience": 15,
+    "seed": 42,
+    "tf32": true,
+    "workers": 4
+  },
+  "source_base_commit": "c8796f8146b17355fa58e6ee03d6892eff9bb547",
+  "source_note": "Training used the base commit plus the recorded cuDNN adjustment; the source hash identifies the trained snapshot, not a later delivery commit.",
+  "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a",
+  "status": "completed",
+  "validation": {
+    "best_checkpoint_replays": 15,
+    "changed_replay_predictions": 0,
+    "checkpoint_files_verified": 30,
+    "each_experiment_oof_samples": 3968,
+    "max_replay_probability_error": 0.0,
+    "replay_atol": 1e-05,
+    "replay_rtol": 0.0001
+  },
+  "weights_sha256": "11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca"
+}

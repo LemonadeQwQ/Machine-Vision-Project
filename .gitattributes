@@ -1,2 +1,6 @@
 # Preserve frozen manifest bytes so checksums survive a platform change.
 DATA/manifests/** -text
+
+# Preserve the reviewed aggregate result bytes and their source checksums.
+reports/experiments/20261029_core/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+reports/experiments/experiment_status.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
