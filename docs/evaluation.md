@@ -120,8 +120,10 @@ reported separately. Partial runs, smoke runs and mixed versions are rejected.
 Each fold selects the highest validation Macro F1, retaining the earliest tied
 epoch. Final refit uses the median of the five best epochs on the full development
 set. Only then evaluate the fixed holdout; do not tune settings or select epochs
-on it. See the [experiment plan](experiment_plan.md). Real results remain pending;
-artificial smoke results never populate the formal results table.
+on it. See the [experiment plan](experiment_plan.md). The [October 29 core
+results](../reports/experiments/20261029_core/SUMMARY.md) contain completed E00,
+E01 and E02 cross-validation; refit and holdout evaluation remain pending.
+Artificial smoke results never populate the formal results table.
 
 ## Synthetic checks and historical compatibility
 

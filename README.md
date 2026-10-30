@@ -5,7 +5,7 @@ The current plan uses nine diagnostic classes: E00 (dermoscopic), E01 (clinical)
 and E02 (simple two-image feature fusion), each with five independent folds.
 E03–E09 are later controlled comparisons.
 
-## Delivery status — 2026-10-28
+## Delivery status — 2026-10-29
 
 The A/B/C deliveries are integrated: data preparation and class schemas (A),
 training/models/configuration (B), and evaluation/tests/documentation (C).
@@ -14,10 +14,32 @@ execution still requires locally generated manifests, images and verified
 weights. Integration checks and merge status are recorded in
 [PR #1](https://github.com/LemonadeQwQ/Machine-Vision-Project/pull/1).
 
-Real-data GPU smoke checks and formal training have not started. There are no
-new E00–E09 model-performance results. Historical PanDerm, MONET and Gate results
-are separate work. Existing label-distribution reports and the synthetic
-evaluation demonstration are not evidence of trained-model performance.
+E00, E01 and E02 have each completed five real-data folds on Nibi. The 15 best
+checkpoints reproduced their validation predictions exactly in the final audit;
+all 30 best/last checkpoints were checked. Each experiment's pooled OOF results
+cover the same 3,968 development cases. Final refit and fixed holdout evaluation
+have not run; E03–E09 remain planned.
+
+| Experiment | Input | Five-fold Macro F1 mean ± sample SD | Pooled OOF Macro F1 |
+| --- | --- | ---: | ---: |
+| E00 | Dermoscopy | 48.07% ± 4.23 percentage points | 48.81% |
+| E01 | Clinical | 38.35% ± 3.81 percentage points | 39.23% |
+| E02 | Simple paired fusion | 49.63% ± 2.39 percentage points | 49.93% |
+
+See the [verified core summary](reports/experiments/20261029_core/SUMMARY.md)
+for exact metrics, fold details, aggregate figures and source fingerprints.
+These are development model-selection estimates, not holdout results or a
+significance test. Historical PanDerm, MONET and Gate results, label-distribution
+reports and the synthetic evaluation demonstration remain separate.
+
+This version integrates A's data acceptance (`0bacf4a`), B's cuDNN replay fix
+and training/selection guides (`ccc10bd`), and C's aggregate results (`df34478`).
+The original commits and authors are retained. The training entry point now uses
+`cudnn.benchmark=False` and `cudnn.deterministic=True`, matching the audited
+algorithm-selection settings. Public-specific evaluation behavior remains intact;
+the original training snapshot is still identified by its recorded fingerprints.
+See the [contribution record](docs/contributions.md) for delivery and manual
+review boundaries.
 
 ## Experiment and data protocol
 
@@ -55,14 +77,17 @@ to bypass input checks.
 | `tests/test_resnet_protocol.py`, `tests/test_evaluation_schemas.py` | Artificial-input regression tests — C |
 | `src/data/`, `src/class_schema.py`, `configs/schema/label_mapping.csv` | Data, grouping and class contract — A |
 | `src/experiment.py`, `src/models/fusion.py`, `configs/experiments/` | New training entry point, models and configurations — B |
-| `reports/experiments/` | E00–E09 status table; all 50 fold rows remain planned |
+| `reports/experiments/` | E00–E02: 15 completed folds; E03–E09: 35 planned folds; verified aggregate results |
 | `DATA/PROCESSED_DATA/`, `src/train.py` | Existing 11-class labels and legacy training entry point |
 | `examples/evaluation/`, `tests/test_evaluate.py` | Existing synthetic demonstration and evaluator compatibility tests |
 
 Read the [experiment plan](docs/experiment_plan.md),
 [contribution record](docs/contributions.md), and
 [evaluation contract](docs/evaluation.md), [data protocol](docs/data_protocol.md),
-and [training guide](docs/training.md).
+and [training guide](docs/training.md). The [result format](docs/results_format.md)
+distinguishes internal run artifacts from the public aggregates. The training
+guide, [CV protocol](docs/cross_validation.md), [model selection rules](docs/model_selection.md)
+and [compute plan](docs/compute_plan.md) describe the validated October 29 run.
 Cluster environment setup and job submission are maintained internally.
 
 ## Offline setup and checks
@@ -127,6 +152,7 @@ Reproduce the historical label analysis without images or a GPU:
 python src/analyze_class_distribution.py
 ```
 
-Next comes deployment and real-data GPU smoke verification on Nibi, freezing
-runtime settings and running the core 15 folds. This public delivery does not
-perform those actions.
+The core deployment, GPU checks and 15-fold training are complete. Next steps are
+the remaining controlled comparisons and, under the recorded selection rules,
+final refit followed by fixed holdout evaluation. The October 29 deliveries are integrated in this version; member manual
+review remains separately recorded and is not inferred from automated checks.

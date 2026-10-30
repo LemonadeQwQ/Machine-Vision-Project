@@ -1,19 +1,19 @@
 experiment,fold,status,best_macro_f1,best_epoch,reason
-E00,0,planned,,,not started
-E00,1,planned,,,not started
-E00,2,planned,,,not started
-E00,3,planned,,,not started
-E00,4,planned,,,not started
-E01,0,planned,,,not started
-E01,1,planned,,,not started
-E01,2,planned,,,not started
-E01,3,planned,,,not started
-E01,4,planned,,,not started
-E02,0,planned,,,not started
-E02,1,planned,,,not started
-E02,2,planned,,,not started
-E02,3,planned,,,not started
-E02,4,planned,,,not started
+E00,0,completed,0.4906436119064954,92,max_epochs
+E00,1,completed,0.4092831747399209,10,early_stopping
+E00,2,completed,0.5158606318213261,20,early_stopping
+E00,3,completed,0.5075174321475763,39,early_stopping
+E00,4,completed,0.4803186035242695,39,early_stopping
+E01,0,completed,0.389064509525862,43,early_stopping
+E01,1,completed,0.3604145661390742,32,early_stopping
+E01,2,completed,0.4301374214393712,24,early_stopping
+E01,3,completed,0.4052715582204649,49,early_stopping
+E01,4,completed,0.33244320296502633,11,early_stopping
+E02,0,completed,0.46523356708601404,38,early_stopping
+E02,1,completed,0.49318240572355027,27,early_stopping
+E02,2,completed,0.5129260555572163,18,early_stopping
+E02,3,completed,0.5260270964413863,16,early_stopping
+E02,4,completed,0.484039283833328,20,early_stopping
 E03,0,planned,,,not started
 E03,1,planned,,,not started
 E03,2,planned,,,not started

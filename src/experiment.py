@@ -114,7 +114,11 @@ def configure_runtime(config, device):
         torch.cuda.manual_seed_all(config['seed'])
         if config['amp'] == 'bf16' and not torch.cuda.is_bf16_supported():
             raise RuntimeError('BF16 unsupported; make a separately recorded config with amp=off')
-        torch.backends.cudnn.benchmark = True
+        # Keep training validation and checkpoint replay on a stable convolution
+        # algorithm. Autotuning can choose a different BF16 kernel in each
+        # process and exceed the prediction-reload verification tolerance.
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
         torch.backends.cuda.matmul.allow_tf32 = config['tf32']
         torch.backends.cudnn.allow_tf32 = config['tf32']
 

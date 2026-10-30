@@ -1,0 +1,189 @@
+{
+  "counts": {
+    "isic_train": 20279,
+    "milk_dev": 3968,
+    "milk_holdout": 1037
+  },
+  "date": "2026-10-29",
+  "dev_holdout_group_overlap": 0,
+  "development_samples_validated_once": 3968,
+  "exclusions": {
+    "conflicting_labels_in_lesion_or_similarity_group": 566,
+    "redundant_exact_image": 37,
+    "schema_exclusion": 53,
+    "similarity_group_touches_fixed_holdout": 182,
+    "similarity_group_touches_milk": 4449
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "train_classes": {
+        "AKIEC": 193,
+        "BCC": 1596,
+        "BKL": 338,
+        "DF": 32,
+        "INF": 31,
+        "MEL": 260,
+        "NV": 398,
+        "SCCKA": 301,
+        "VASC": 24
+      },
+      "train_groups": 3168,
+      "train_samples": 3173,
+      "train_val_group_overlap": 0,
+      "val_classes": {
+        "AKIEC": 48,
+        "BCC": 399,
+        "BKL": 85,
+        "DF": 9,
+        "INF": 8,
+        "MEL": 66,
+        "NV": 99,
+        "SCCKA": 75,
+        "VASC": 6
+      },
+      "val_groups": 794,
+      "val_samples": 795
+    },
+    {
+      "fold": 1,
+      "train_classes": {
+        "AKIEC": 193,
+        "BCC": 1596,
+        "BKL": 339,
+        "DF": 33,
+        "INF": 31,
+        "MEL": 261,
+        "NV": 397,
+        "SCCKA": 301,
+        "VASC": 24
+      },
+      "train_groups": 3171,
+      "train_samples": 3175,
+      "train_val_group_overlap": 0,
+      "val_classes": {
+        "AKIEC": 48,
+        "BCC": 399,
+        "BKL": 84,
+        "DF": 8,
+        "INF": 8,
+        "MEL": 65,
+        "NV": 100,
+        "SCCKA": 75,
+        "VASC": 6
+      },
+      "val_groups": 791,
+      "val_samples": 793
+    },
+    {
+      "fold": 2,
+      "train_classes": {
+        "AKIEC": 192,
+        "BCC": 1596,
+        "BKL": 338,
+        "DF": 33,
+        "INF": 31,
+        "MEL": 261,
+        "NV": 398,
+        "SCCKA": 301,
+        "VASC": 24
+      },
+      "train_groups": 3169,
+      "train_samples": 3174,
+      "train_val_group_overlap": 0,
+      "val_classes": {
+        "AKIEC": 49,
+        "BCC": 399,
+        "BKL": 85,
+        "DF": 8,
+        "INF": 8,
+        "MEL": 65,
+        "NV": 99,
+        "SCCKA": 75,
+        "VASC": 6
+      },
+      "val_groups": 793,
+      "val_samples": 794
+    },
+    {
+      "fold": 3,
+      "train_classes": {
+        "AKIEC": 193,
+        "BCC": 1596,
+        "BKL": 338,
+        "DF": 33,
+        "INF": 32,
+        "MEL": 261,
+        "NV": 397,
+        "SCCKA": 301,
+        "VASC": 24
+      },
+      "train_groups": 3170,
+      "train_samples": 3175,
+      "train_val_group_overlap": 0,
+      "val_classes": {
+        "AKIEC": 48,
+        "BCC": 399,
+        "BKL": 85,
+        "DF": 8,
+        "INF": 7,
+        "MEL": 65,
+        "NV": 100,
+        "SCCKA": 75,
+        "VASC": 6
+      },
+      "val_groups": 792,
+      "val_samples": 793
+    },
+    {
+      "fold": 4,
+      "train_classes": {
+        "AKIEC": 193,
+        "BCC": 1596,
+        "BKL": 339,
+        "DF": 33,
+        "INF": 31,
+        "MEL": 261,
+        "NV": 398,
+        "SCCKA": 300,
+        "VASC": 24
+      },
+      "train_groups": 3170,
+      "train_samples": 3175,
+      "train_val_group_overlap": 0,
+      "val_classes": {
+        "AKIEC": 48,
+        "BCC": 399,
+        "BKL": 84,
+        "DF": 8,
+        "INF": 8,
+        "MEL": 65,
+        "NV": 99,
+        "SCCKA": 76,
+        "VASC": 6
+      },
+      "val_groups": 792,
+      "val_samples": 793
+    }
+  ],
+  "formal_oof_experiments_verified": [
+    "E00",
+    "E01",
+    "E02"
+  ],
+  "gpu_checkpoint_replay_verification": "All 15 best checkpoints passed strict probability replay.",
+  "group_basis": "lesion IDs + exact SHA256 + pHash64 D4 distance <= 4 candidate components",
+  "holdout_evaluated": false,
+  "isic_in_validation": false,
+  "isic_used_in_core_training": false,
+  "limitations": [
+    "Patient-level independence cannot be claimed",
+    "Perceptual candidates are not confirmed duplicates",
+    "Historical use means holdout is not a previously unseen external benchmark"
+  ],
+  "manifest_sha256": "0ee819e4fcc825834f2c99b906ac3c3f4effe7211280d544fd85ed72382a141c",
+  "patient_id_available": false,
+  "protocol": "resnet9-v1",
+  "splitter": "StratifiedGroupKFold(n_splits=5,shuffle=True,random_state=42)",
+  "status": "passed"
+}

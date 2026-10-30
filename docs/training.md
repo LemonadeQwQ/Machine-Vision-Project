@@ -1,6 +1,6 @@
 # ResNet 九类训练协议
 
-本页记录已整合到 public 的模型、运行入口和实验规则。代码交付不代表真实 GPU 短检、正式训练或最终评估已经完成。
+2026-10-29，核心 E00／E01／E02 共 15 折及三组汇总已完成；30 个 checkpoint 审计和 15 个最佳模型完整验证折重推理通过，概率最大绝对差为 0。真实指标见 [核心摘要](../reports/experiments/20261029_core/SUMMARY.md)，运行预算见 [计算计划](compute_plan.md)。E03～E09、refit 和固定 holdout 仍未执行。以下命令用于复现，必须使用新输出目录，不重复写入已完成结果。
 
 ## 模型和实验
 
@@ -21,13 +21,13 @@
 
 图像 EXIF 校正后转 RGB，等比例缩放补黑边至 224×224；训练随机水平／垂直翻转、±20° 旋转，两模态用相同随机参数；验证无随机增强。旋转不扩展画布，角落内容可能被裁去，E09 关闭上述几何增强。归一化采用 ImageNet RGB 均值／标准差。
 
-AdamW：骨干学习率 1e-5、分类头 1e-4、weight decay 1e-4、梯度范数上限 5。默认 batch 32、BF16、channels_last、TF32、4 个 worker、每 worker 预取 2 个 batch。候选上限 100 epoch，验证 Macro F1 连续 15 轮不提升则停止；相同分数保留较早 epoch。加权实验使用训练折 `w=(1/n)/mean(1/n)`，零计数拒绝。全部配置在 `configs/experiments/`；性能参数需集群真实短检后才能定为最终值。
+AdamW：骨干学习率 1e-5、分类头 1e-4、weight decay 1e-4、梯度范数上限 5。默认 batch 32、BF16、channels_last、TF32、4 个 worker、每 worker 预取 2 个 batch。每折上限 100 epoch，验证 Macro F1 连续 15 轮不提升则停止；相同分数保留较早 epoch。加权实验使用训练折 `w=(1/n)/mean(1/n)`，零计数拒绝。全部配置在 `configs/experiments/`。本次核心运行已验证并冻结 batch 32、4 workers、BF16、channels_last、TF32；使用 H100 MIG 1g.10gb、4 CPU、24G 主机内存，最多两折并发。cuDNN 使用 `benchmark=False, deterministic=True`；保持原预测读回容差 `rtol=1e-4, atol=1e-5`。
 
 ## 运行环境和输入
 
 真实训练仅在获准的 Nibi GPU 作业中执行；本页给出通用 Python 入口。
 环境安装、数据暂存、资源申请和 Slurm 提交由集成人在内部集群脚本维护，
-不属于 public 仓库。当前没有新流程的 GPU 短检或正式训练结果。
+不属于 public 仓库。29 日已完成五组真实 GPU smoke 与核心五折训练；复现前应核对本次实际设置、输入版本和当前硬件。
 
 训练环境需匹配的 PyTorch／torchvision，以及 `requirements-train.txt` 中的依赖。
 原图、权重、环境和逐病例清单不进入 public。数据准备见 [数据协议](data_protocol.md)，
@@ -78,8 +78,7 @@ ISIC 缺临床图，验证侧始终只含 MILK。每个配置预定两轮：
 smoke 产物必须使用独立目录，不进入正式结果表。普通 `--smoke` 默认只运行一轮。
 
 检查 CUDA、显存余量、吞吐、数据读取、缺失模态、checkpoint 和预测读回。
-当前 batch、worker 数、精度和并发设置都是待测候选；必要调整在正式 CV 前记录并冻结。
-集群旧环境的前向自检不能替代本轮验证。
+本次 10 GB MIG 上核心双模态 PyTorch 预留峰值约 1.03 GiB，完整折第二轮训练加验证约 9.22 秒，不含 checkpoint 和最终产物写入。更换硬件、batch、worker 数、精度或并发设置时重新验证并记录版本，不能在同一五折中途混用配置。集群旧环境的前向自检不能替代这些检查。
 
 ## 核心五折与恢复
 
@@ -131,7 +130,7 @@ python -m src.refit --cv-summary "$RUN_ROOT/E00/summary/cv_summary.json" \
   --output "$RUN_ROOT/E00/refit"
 ```
 
-refit 复用 CV summary 中冻结的配置，恢复时传 `--resume`。
+refit 复用 CV summary 中冻结的配置，恢复时传 `--resume`。核心预定轮数为 E00＝39、E01＝32、E02＝20，见 [模型选择](model_selection.md)；这些是按五折中位数计算的计划，本次尚未执行。
 完成后才在 GPU 作业中推理并评估固定 holdout：
 
 ```bash
