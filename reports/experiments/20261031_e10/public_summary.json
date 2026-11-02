@@ -1,0 +1,388 @@
+{
+  "schema_version": 1,
+  "protocol": "resnet9-v1",
+  "as_of": "2026-10-31",
+  "status": "completed",
+  "completed_folds": 55,
+  "manifest_sha256": "0ee819e4fcc825834f2c99b906ac3c3f4effe7211280d544fd85ed72382a141c",
+  "results": [
+    {
+      "experiment": "E00",
+      "description": "Dermoscopy",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6633205028417966,
+          "sample_std": 0.028514276210379233
+        },
+        "macro_f1": {
+          "mean": 0.48072469082791763,
+          "sample_std": 0.04229310067885531
+        },
+        "macro_precision": {
+          "mean": 0.5058409123416955,
+          "sample_std": 0.04986092095426635
+        },
+        "macro_recall": {
+          "mean": 0.47510511435043357,
+          "sample_std": 0.046741731126063404
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.4881458561371141,
+        "accuracy": 0.6633064516129032,
+        "macro_precision": 0.5108696546903653,
+        "macro_recall": 0.474801297615507
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 39,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E01",
+      "description": "Clinical",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6295406708002724,
+          "sample_std": 0.029993044363533065
+        },
+        "macro_f1": {
+          "mean": 0.3834662516579597,
+          "sample_std": 0.038143615708886164
+        },
+        "macro_precision": {
+          "mean": 0.41803783029965735,
+          "sample_std": 0.06463114168792528
+        },
+        "macro_recall": {
+          "mean": 0.37295595573252954,
+          "sample_std": 0.03038503552947598
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.392307676434287,
+        "accuracy": 0.6295362903225806,
+        "macro_precision": 0.4309468937820206,
+        "macro_recall": 0.3727759563300498
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 32,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E02",
+      "description": "Paired fusion",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6895214601233217,
+          "sample_std": 0.011762602086340106
+        },
+        "macro_f1": {
+          "mean": 0.496281681728299,
+          "sample_std": 0.02390236451390934
+        },
+        "macro_precision": {
+          "mean": 0.5543246114658791,
+          "sample_std": 0.04601935190093866
+        },
+        "macro_recall": {
+          "mean": 0.46866668965600117,
+          "sample_std": 0.015346097743532875
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.499294067559742,
+        "accuracy": 0.6895161290322581,
+        "macro_precision": 0.5510751724103862,
+        "macro_recall": 0.4689072110884002
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 20,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E03",
+      "description": "Dermoscopy + weighted CE",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6446584830805022,
+          "sample_std": 0.018042218726285936
+        },
+        "macro_f1": {
+          "mean": 0.4875334412212909,
+          "sample_std": 0.01722932913221194
+        },
+        "macro_precision": {
+          "mean": 0.49086963882443546,
+          "sample_std": 0.018990453026832436
+        },
+        "macro_recall": {
+          "mean": 0.5034688243541258,
+          "sample_std": 0.04253608897382368
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.4881364449607696,
+        "accuracy": 0.6446572580645161,
+        "macro_precision": 0.4792976410250234,
+        "macro_recall": 0.5033923841849894
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 31,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E04",
+      "description": "Dermoscopy + ISIC",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.71145297920018,
+          "sample_std": 0.017054644751254965
+        },
+        "macro_f1": {
+          "mean": 0.5359435631002417,
+          "sample_std": 0.025767036734407583
+        },
+        "macro_precision": {
+          "mean": 0.563954477055598,
+          "sample_std": 0.03344791215921105
+        },
+        "macro_recall": {
+          "mean": 0.5266752313106433,
+          "sample_std": 0.03348448208184341
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.5377468403852397,
+        "accuracy": 0.7114415322580645,
+        "macro_precision": 0.5541452874833946,
+        "macro_recall": 0.5262516795660998
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 23,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E05",
+      "description": "Dermoscopy + ISIC + weighted CE",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6980977598151562,
+          "sample_std": 0.019126323040278486
+        },
+        "macro_f1": {
+          "mean": 0.5438552732336732,
+          "sample_std": 0.026940371940737323
+        },
+        "macro_precision": {
+          "mean": 0.5815484710254473,
+          "sample_std": 0.03998015017831731
+        },
+        "macro_recall": {
+          "mean": 0.5286608269584092,
+          "sample_std": 0.028554930060111845
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.5475908682273116,
+        "accuracy": 0.6980846774193549,
+        "macro_precision": 0.5799249612637308,
+        "macro_recall": 0.5284296947068189
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 24,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E06",
+      "description": "Paired + weighted CE",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6376002032421778,
+          "sample_std": 0.03417549911767356
+        },
+        "macro_f1": {
+          "mean": 0.4905700732942833,
+          "sample_std": 0.0284427391679195
+        },
+        "macro_precision": {
+          "mean": 0.4834508698492728,
+          "sample_std": 0.023904766014547076
+        },
+        "macro_recall": {
+          "mean": 0.522637615165479,
+          "sample_std": 0.03678944101225181
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.4899214771196721,
+        "accuracy": 0.6376008064516129,
+        "macro_precision": 0.47266902272031963,
+        "macro_recall": 0.5220568654036426
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 14,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E07",
+      "description": "Paired + ISIC + weighted CE",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.7157239952206843,
+          "sample_std": 0.010850431298993844
+        },
+        "macro_f1": {
+          "mean": 0.5469850371500988,
+          "sample_std": 0.025071050939593963
+        },
+        "macro_precision": {
+          "mean": 0.5861837694714604,
+          "sample_std": 0.04153296536030521
+        },
+        "macro_recall": {
+          "mean": 0.5271679541784953,
+          "sample_std": 0.016897763910921702
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.5488604381818367,
+        "accuracy": 0.7157258064516129,
+        "macro_precision": 0.5824045412710845,
+        "macro_recall": 0.526526421898008
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 14,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E08",
+      "description": "Paired + metadata",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6854924983926676,
+          "sample_std": 0.015039245715403587
+        },
+        "macro_f1": {
+          "mean": 0.4873352041425035,
+          "sample_std": 0.028067802972528418
+        },
+        "macro_precision": {
+          "mean": 0.5429224443608064,
+          "sample_std": 0.05183824169778157
+        },
+        "macro_recall": {
+          "mean": 0.4735472446670294,
+          "sample_std": 0.0318560627588978
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.4911742579076933,
+        "accuracy": 0.6854838709677419,
+        "macro_precision": 0.5223651161761333,
+        "macro_recall": 0.4737728543256565
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 16,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E09",
+      "description": "Paired, augmentation off",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.6779361297831638,
+          "sample_std": 0.024909647778733803
+        },
+        "macro_f1": {
+          "mean": 0.4840363285378391,
+          "sample_std": 0.04048728379408136
+        },
+        "macro_precision": {
+          "mean": 0.524118677061433,
+          "sample_std": 0.05032006031929906
+        },
+        "macro_recall": {
+          "mean": 0.47085663300885183,
+          "sample_std": 0.02519096122121146
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.4849106608630579,
+        "accuracy": 0.6779233870967742,
+        "macro_precision": 0.5127450292984896,
+        "macro_recall": 0.4707907039762758
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 15,
+      "source_sha256": "72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a"
+    },
+    {
+      "experiment": "E10",
+      "description": "Paired + ISIC + weighted CE + metadata",
+      "fold_metrics": {
+        "accuracy": {
+          "mean": 0.7122029419572935,
+          "sample_std": 0.013472054157072332
+        },
+        "macro_f1": {
+          "mean": 0.5700182582879045,
+          "sample_std": 0.020702290093352796
+        },
+        "macro_precision": {
+          "mean": 0.6268347677469026,
+          "sample_std": 0.031464257243608455
+        },
+        "macro_recall": {
+          "mean": 0.5466423783243037,
+          "sample_std": 0.01907475751242932
+        }
+      },
+      "pooled_oof_metrics": {
+        "macro_f1": 0.5691621511042245,
+        "accuracy": 0.7121975806451613,
+        "macro_precision": 0.6007439036127258,
+        "macro_recall": 0.5464905901642847
+      },
+      "n_oof": 3968,
+      "prescribed_epochs_if_selected_for_refit": 13,
+      "source_sha256": "a8a74758b6f29c9c78ab838c7b3f8d7d565fdaf4674f9f90830463a8888d1e9d"
+    }
+  ],
+  "selection": {
+    "primary": "E10",
+    "control": "E07",
+    "criterion": "highest five-fold mean nine-class Macro F1",
+    "selected_after_cv": true,
+    "roles_fixed_before_final_holdout": true
+  },
+  "refit": {
+    "status": "completed_and_checkpoint_audited",
+    "epochs": {
+      "E10": 13,
+      "E07": 14
+    },
+    "train_samples_per_model": 24247,
+    "validation_samples": 0,
+    "checkpoint_files_verified": 4
+  },
+  "holdout_evaluated": true,
+  "holdout": {
+    "status": "completed",
+    "cases_per_model": 1037,
+    "results": "../../holdout/20261031_holdout_e10_e07_v1/summary.csv"
+  },
+  "validation": {
+    "cv_checkpoint_files_verified": 110,
+    "best_checkpoint_validation_replays": 55,
+    "max_replay_probability_error": 0.0,
+    "each_experiment_oof_samples": 3968
+  },
+  "e10_design": "Added after inspecting E00-E09; metadata is the sole configuration change from E07.",
+  "limitations": [
+    "CV selects epochs on the fold validation data; these are development selection estimates.",
+    "Differences in mean scores are not a significance test.",
+    "No patient IDs; grouping is by lesion and conservative image-similarity components.",
+    "Fixed holdout has historical exposure and is not a never-seen external benchmark."
+  ],
+  "provenance_note": "Source SHA-256 values identify the original training snapshots, not this later public delivery. Raw case-level inputs and outputs are not distributed."
+}

@@ -1,15 +1,34 @@
-# 新正式 ResNet 实验
+# Formal nine-class ResNet experiments
 
-2026-10-29，E00／E01／E02 各五折已完成。`experiment_status.csv` 覆盖 E00～E09 共 50 折：15 折 completed，E03～E09 的 35 折 planned 且成绩为空。meeting1 历史成绩、人工短检查和资源测速不计入正式结果。
+E00–E10 completed all 55 folds. [experiment_status.csv](experiment_status.csv)
+records the real completed runs; the [latest comparison](20261031_e10/SUMMARY.md)
+contains all eleven groups. Every group's pooled OOF covers 3,968 development
+cases. Historical models, synthetic tests and resource measurements are excluded.
 
-本次 [核心摘要](20261029_core/SUMMARY.md) 包含五折均值／样本标准差、pooled OOF、实际轮数、硬件与来源指纹；三组 OOF 均覆盖相同的 3,968 例。公开文件只有聚合表、每类指标、混淆矩阵和统计图，不包含逐病例预测或标签。完整 checkpoint 和日志保存在训练环境，原始运行记录与完整审计证据保留在内部项目。
+The [October 29 core snapshot](20261029_core/SUMMARY.md) remains unchanged.
+E03–E09 pooled OOF class tables and confusion matrices are in
+`20261030_expansion/E03/summary/pooled_oof/` through `E09`.
+`20261031_e10/` contains the eleven-group aggregate tables, E10's pooled OOF
+class results, E10/E07 comparisons and the current aggregate JSON.
 
-`scripts/collect_results.py` 从真实完成折收集指标，`scripts/summarize_cv.py` 检查五折一致性与 OOF 覆盖。只有具备相应运行产物和本地清单才能重新汇总，不能用聚合表代替逐病例输入。
-
-重绘聚合比较图，不需要原图或逐病例预测：
+Redraw the current comparison from public aggregate numbers only:
 
 ```bash
-python tools/plot_cv_summary.py --summary reports/experiments/20261029_core/public_summary.json --output reports/experiments/20261029_core/summary_comparison.png
+python tools/plot_cv_summary.py --summary reports/experiments/20261031_e10/public_summary.json --output reports/experiments/20261031_e10/cv_comparison.png
 ```
 
-这些是开发选模结果，不是独立最终测试。refit 与固定 holdout 尚未执行；预定 refit 轮数不表示已训练。A 的 29 日数据验收、B 的训练修复已在本版本整合，组员人工复核另行记录，见 [分工说明](../../docs/contributions.md) 和 [结果格式](../../docs/results_format.md)。
+The plotting tool also accepts the three-group `20261029_core/public_summary.json`.
+Historical snapshots keep their historical holdout status. The latest plot
+states that holdout results are reported separately.
+
+E10 primary and E07 control completed 13/14-epoch refits and final holdout
+assessment; see the [holdout summary](../holdout/20261031_holdout_e10_e07_v1/SUMMARY.md).
+CV means, sample SD, pooled OOF and final holdout metrics are distinct quantities.
+
+`collect_results.py` enumerates E00–E10 but still marks absent runs planned;
+the committed completed status is copied from accepted real runs.
+`summarize_cv.py` recomputes from local probabilities and manifests, which are
+not distributed here. Public aggregates cannot substitute for case-level inputs.
+
+This C branch defers tests to A/B/C integration; B's E10 configuration and
+registration are pending. See [contributions](../../docs/contributions.md).

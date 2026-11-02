@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "model_name": "E07 refit (control) - fixed holdout",
+  "unit": "lesion",
+  "n_lesions": 1037,
+  "class_order": [
+    "AKIEC",
+    "BCC",
+    "BKL",
+    "DF",
+    "INF",
+    "MEL",
+    "NV",
+    "SCCKA",
+    "VASC"
+  ],
+  "primary_metric": "macro_f1",
+  "metric_scale": "0 to 1",
+  "accuracy": 0.7000964320154291,
+  "macro_f1": 0.5328253656721884,
+  "macro_precision": 0.6125456374340623,
+  "macro_recall": 0.5309349265502353,
+  "metric_policy": {
+    "macro_average_classes": "all 9, including classes absent from labels",
+    "zero_division": 0,
+    "prediction": "argmax probability",
+    "tie_break": "first class in class_order",
+    "probability_sum_atol": 1e-05,
+    "normalized_confusion_matrix": "rows divided by true-class support; absent rows stored as 0"
+  },
+  "tied_prediction_rows": 5,
+  "classes_without_true_examples": [],
+  "warnings": [],
+  "sources": {
+    "labels": {
+      "sha256": "9e20b0d7a8ec2880952fceb8aeb9663edf7a882a4aaef92c440de787d8d5236c",
+      "availability": "Case-level input retained internally; not distributed in this public repository."
+    },
+    "predictions": {
+      "sha256": "6e4cf4cd8d33df5dd7143061281aec92dd8e440179a5928fd71830cefa3a7e31",
+      "availability": "Case-level input retained internally; not distributed in this public repository."
+    }
+  },
+  "environment": {
+    "python": "3.11.5",
+    "numpy": "1.26.4",
+    "scikit-learn": "1.8.0",
+    "matplotlib": "3.10.8"
+  },
+  "public_export_note": "Aggregate public export; source paths removed. Numeric metrics are unchanged; this JSON is not byte-identical to the original run artifact."
+}

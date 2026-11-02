@@ -11,7 +11,7 @@ from src.data.common import write_csv
 def collect(root, output):
     root, output = Path(root), Path(output)
     rows = []
-    for index in range(10):
+    for index in range(11):
         experiment = f'E{index:02}'
         for fold in range(5):
             file = root / experiment / f'fold_{fold}' / 'run.json'

@@ -22,6 +22,20 @@ python scripts/summarize_cv.py --runs RESULTS_ROOT/E00 --output RESULTS_ROOT/E00
 
 汇总拒绝 smoke、缺折、非 completed、混合配置／源码／清单及 OOF 缺失或重复。按 ID 与九类列名重算各折指标，报告均值和样本标准差；合并折外概率后另算 pooled OOF。验证折用于选 epoch，因此属于开发选模估计，不是独立最终测试。
 
-## 29 日实际状态
+## 已完成的 CV 与最终评估
 
-E00／E01／E02 共 15 折全部成功，三组 OOF 各覆盖 3,968 例。见 [结果摘要](../reports/experiments/20261029_core/SUMMARY.md) 和 [结果格式](results_format.md)。后续以五折最佳 epoch 中位数 refit 完整开发集，再评估固定 holdout；这两步尚未执行。
+E00～E10 共 55 折全部完成，各组 OOF 均覆盖同一 3,968 例。110 个 CV checkpoint
+已审计，55 个 best checkpoint 完整验证折重推理最大概率绝对差为 0。
+见 [十一组结果](../reports/experiments/20261031_e10/SUMMARY.md) 与 [结果格式](results_format.md)。
+
+小组在 CV 后按五折平均九类 Macro F1 选择 E10 主模型，并固定 E07 为对照；
+E10 是查看原十组结果后追加的配置，不能称为训练前注册的跨配置选择。
+各自最佳 epoch 中位数为 13／14，两组已在全部 3,968 MILK＋20,279 ISIC 上独立 refit，
+重新拟合训练侧统计，不使用验证早停。两模型随后完成同一 1,037 例固定 holdout 的评估，
+详见 [最终结果](../reports/holdout/20261031_holdout_e10_e07_v1/SUMMARY.md)。
+
+E10 对 E07 只改变元数据开关。元数据统计／词表只用各折训练侧拟合，refit 时用完整训练侧
+重新拟合，holdout 复用已保存的编码器。原图和逐病例记录不随本次公开交付。
+
+本 C 分支发布聚合结果，B 的 E10 配置与注册、A 的最终数据说明仍待整合；测试留到合并时
+执行，不把真实实验完成等同于本分支通过集成检查。见 [分工状态](contributions.md)。

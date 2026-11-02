@@ -14,38 +14,43 @@ E02,1,completed,0.49318240572355027,27,early_stopping
 E02,2,completed,0.5129260555572163,18,early_stopping
 E02,3,completed,0.5260270964413863,16,early_stopping
 E02,4,completed,0.484039283833328,20,early_stopping
-E03,0,planned,,,not started
-E03,1,planned,,,not started
-E03,2,planned,,,not started
-E03,3,planned,,,not started
-E03,4,planned,,,not started
-E04,0,planned,,,not started
-E04,1,planned,,,not started
-E04,2,planned,,,not started
-E04,3,planned,,,not started
-E04,4,planned,,,not started
-E05,0,planned,,,not started
-E05,1,planned,,,not started
-E05,2,planned,,,not started
-E05,3,planned,,,not started
-E05,4,planned,,,not started
-E06,0,planned,,,not started
-E06,1,planned,,,not started
-E06,2,planned,,,not started
-E06,3,planned,,,not started
-E06,4,planned,,,not started
-E07,0,planned,,,not started
-E07,1,planned,,,not started
-E07,2,planned,,,not started
-E07,3,planned,,,not started
-E07,4,planned,,,not started
-E08,0,planned,,,not started
-E08,1,planned,,,not started
-E08,2,planned,,,not started
-E08,3,planned,,,not started
-E08,4,planned,,,not started
-E09,0,planned,,,not started
-E09,1,planned,,,not started
-E09,2,planned,,,not started
-E09,3,planned,,,not started
-E09,4,planned,,,not started
+E03,0,completed,0.496522638190931,58,early_stopping
+E03,1,completed,0.4762356004755126,31,early_stopping
+E03,2,completed,0.4934390624240382,31,early_stopping
+E03,3,completed,0.5073868205176326,17,early_stopping
+E03,4,completed,0.46408308449834007,36,early_stopping
+E04,0,completed,0.5032347318055408,23,early_stopping
+E04,1,completed,0.5524482522955397,34,early_stopping
+E04,2,completed,0.5195756087465608,12,early_stopping
+E04,3,completed,0.5682780949746546,14,early_stopping
+E04,4,completed,0.5361811276789124,33,early_stopping
+E05,0,completed,0.5104923097823656,16,early_stopping
+E05,1,completed,0.527452124686547,34,early_stopping
+E05,2,completed,0.5621955872489718,24,early_stopping
+E05,3,completed,0.578153468040623,42,early_stopping
+E05,4,completed,0.5409828764098588,14,early_stopping
+E06,0,completed,0.4885735134568186,15,early_stopping
+E06,1,completed,0.5057387354689646,13,early_stopping
+E06,2,completed,0.4525402512736161,7,early_stopping
+E06,3,completed,0.5279655368827029,14,early_stopping
+E06,4,completed,0.47803232938931445,21,early_stopping
+E07,0,completed,0.5454335909793819,48,early_stopping
+E07,1,completed,0.542142296885039,14,early_stopping
+E07,2,completed,0.5532397768137067,40,early_stopping
+E07,3,completed,0.5820493299106357,9,early_stopping
+E07,4,completed,0.5120601911617305,14,early_stopping
+E08,0,completed,0.4680267794178674,27,early_stopping
+E08,1,completed,0.47224583805514353,16,early_stopping
+E08,2,completed,0.520758624115223,32,early_stopping
+E08,3,completed,0.5145908627966614,16,early_stopping
+E08,4,completed,0.4610539163276221,10,early_stopping
+E09,0,completed,0.4287872105162005,12,early_stopping
+E09,1,completed,0.46520967038475625,11,early_stopping
+E09,2,completed,0.5117851023476935,33,early_stopping
+E09,3,completed,0.5327623264166077,15,early_stopping
+E09,4,completed,0.4816373330239378,53,early_stopping
+E10,0,completed,0.5478340149066121,9,early_stopping
+E10,1,completed,0.5696244654239738,51,early_stopping
+E10,2,completed,0.5576403640386729,21,early_stopping
+E10,3,completed,0.6026268667601488,10,early_stopping
+E10,4,completed,0.5723655803101149,13,early_stopping

@@ -120,10 +120,21 @@ reported separately. Partial runs, smoke runs and mixed versions are rejected.
 Each fold selects the highest validation Macro F1, retaining the earliest tied
 epoch. Final refit uses the median of the five best epochs on the full development
 set. Only then evaluate the fixed holdout; do not tune settings or select epochs
-on it. See the [experiment plan](experiment_plan.md). The [October 29 core
-results](../reports/experiments/20261029_core/SUMMARY.md) contain completed E00,
-E01 and E02 cross-validation; refit and holdout evaluation remain pending.
-Artificial smoke results never populate the formal results table.
+on it. All E00–E10 CV runs are now complete; see the
+[eleven-group CV summary](../reports/experiments/20261031_e10/SUMMARY.md).
+E10 primary and E07 control completed 13/14-epoch refits. On the same 1,037-case
+fixed holdout, their Macro F1 is 56.62% / 53.28%, and Accuracy 70.49% / 70.01%.
+Roles were fixed before evaluation; no holdout-driven retuning or role swapping
+was performed. See the [final report](../reports/holdout/20261031_holdout_e10_e07_v1/SUMMARY.md)
+for both models, class supports and limitations. The inherited holdout has
+historical exposure and is not a never-seen external blind test.
+
+Published metrics JSONs preserve numbers, policies, versions and source hashes,
+but remove internal input paths. They are not byte-identical to the original
+run artifacts. Case-level probabilities and aligned labels are not published.
+Artificial checks and online refit training scores never populate holdout tables.
+This C branch leaves B's E10 code dependency and integration tests pending;
+see the [delivery record](contributions.md).
 
 ## Synthetic checks and historical compatibility
 
