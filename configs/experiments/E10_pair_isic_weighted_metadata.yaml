@@ -1,0 +1,5 @@
+experiment: E10
+modality: pair
+weighted: true
+include_isic: true
+metadata: true

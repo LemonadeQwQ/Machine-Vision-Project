@@ -1,4 +1,16 @@
-# 2026-10-29 核心五折计算计划
+# Nibi 五折计算记录
+
+## 31 日双模型 refit
+
+E10 主模型／E07 对照分别固定 13／14 轮，两个作业 `25562135`／`25562136` 均成功。10 月 31 日 01:00:07 同时在 g30 启动，分别于 01:16:36／01:17:42 结束（America/New_York），耗时 16 分 29 秒／17 分 35 秒，包含 staging 和 checkpoint 写入。每组 H100 MIG 1g.10gb、4 CPU、24G、2 小时时限；未申请完整 H100，也没有重新测速。四个最终 checkpoint 已下载并通过本地 CPU 内容核对；无新增 GPU 验收作业，固定 holdout 未推理。见 [完成记录](../reports/refit/20261031_e10_e07_v1/README.md)。
+
+## 30 日扩展实际结果
+
+E03～E09 共 35 折于 2026-10-30 00:07:00～07:30:23 完成，七组汇总和最终审计于 07:37:05 前完成，时间均为 America/New_York。每折 H100 MIG 1g.10gb、4 CPU、24G RAM、4 小时时限；全局最多两折并发，E03／E04 数组全部成功后才启动 E05～E09。37 条正式训练及后处理作业记录全部 `COMPLETED 0:0`。这些墙钟时间包含调度、数据 staging、checkpoint 写入及交接等待，不是纯 GPU 训练时间。
+
+扩展七组沿用核心的 batch 32、workers 4、BF16、channels_last、TF32 和固定 cuDNN 设置。新增验证及完整 fold 0 两轮测量见 [扩展验证](../reports/preparation/20261030_expansion_gpu_validation.json)；逐折和最终完成时间见 [完成记录](../reports/preparation/20261030_expansion_completion.json)。本次没有重新做 10／20 GB 对比，也没有证明完整 H100 或更多并发最优。所有正式训练已结束，无需为本轮再申请算力。
+
+## 29 日核心计算记录
 
 核心 15 折已于 29 日完成，资源按训练前实测冻结。第一折 12:31:28 启动，最后训练 13:22:38 结束，三组汇总 13:23:12 完成，共 51 分 44 秒；累计训练分片时间 1 小时 29 分 35 秒。以下保留训练前性能测量与预算，测速不计入 CV 成绩。
 
@@ -21,7 +33,7 @@
 - 每折请求一个 10 GB H100 MIG、4 CPU、24G 主机内存、2 小时时限；全局最多两折并发。
 - batch 32、workers 4、prefetch 2、CPU threads 4、BF16、TF32、channels_last 保持原配置。
 - `cuDNN benchmark=False, deterministic=True`。初次 E08 smoke 的跨进程概率误差超过原有阈值；调整卷积算法选择后，107 项 CPU 测试、3 项初始化检查及全部五组 GPU smoke 通过。`rtol=1e-4, atol=1e-5` 未放宽。这不等于跨设备或所有 GPU 运算逐位一致。
-- 基础提交 `c8796f8146b17355fa58e6ee03d6892eff9bb547`，实际 src／scripts 指纹 `72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a`；cuDNN 修改尚未提交 Git，必须连同补丁记录理解版本。
+- 训练时的基础提交 `c8796f8146b17355fa58e6ee03d6892eff9bb547`，实际 src／scripts 指纹 `72fd7a2d357c352eb45ca889dabed4d8cf86057112308693a19399d7bc24d19a`；当时 cuDNN 补丁未提交，后已纳入 private `2453ff3`。30 日扩展沿用完全相同的训练源码字节。
 - 清单版本 SHA-256：`0ee819e4fcc825834f2c99b906ac3c3f4effe7211280d544fd85ed72382a141c`。ImageNet V2 权重 SHA-256：`11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca`。
 
 权重的权威哈希以 `configs/schema/pretrained_weights.json` 和运行输入记录为准。

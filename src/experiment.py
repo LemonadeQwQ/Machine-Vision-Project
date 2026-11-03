@@ -39,7 +39,7 @@ def configuration(path, overrides=None):
         if overrides.keys() - base.keys():
             raise ValueError('Unknown override')
         base.update(overrides)
-    if base['protocol'] != 'resnet9-v1' or base.get('experiment') not in [f'E{i:02}' for i in range(10)]:
+    if base['protocol'] != 'resnet9-v1' or base.get('experiment') not in [f'E{i:02}' for i in range(11)]:
         raise ValueError('Unknown protocol / experiment')
     if base['modality'] not in ('derm', 'clinical', 'pair') or (base['metadata'] and base['modality'] != 'pair'):
         raise ValueError('Invalid model configuration')
