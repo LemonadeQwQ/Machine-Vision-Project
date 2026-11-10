@@ -133,8 +133,8 @@ Published metrics JSONs preserve numbers, policies, versions and source hashes,
 but remove internal input paths. They are not byte-identical to the original
 run artifacts. Case-level probabilities and aligned labels are not published.
 Artificial checks and online refit training scores never populate holdout tables.
-This C branch leaves B's E10 code dependency and integration tests pending;
-see the [delivery record](contributions.md).
+The integrated version includes B's E10 dependency and refit documentation;
+see the [delivery record](contributions.md) for candidate validation.
 
 ## Synthetic checks and historical compatibility
 

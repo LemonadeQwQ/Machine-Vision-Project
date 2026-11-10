@@ -54,5 +54,6 @@ labels or raw run records are published. Training source fingerprints are
 preserved per experiment in the public JSON; this later public branch is not
 the original training snapshot.
 
-This C delivery includes results and tests; B's E10 configuration and experiment
-registration remain to be integrated. See the [delivery record](../../../docs/contributions.md).
+The integrated public version includes E10's configuration and experiment
+registration, data acceptance and the [refit summary](../../refit/20261031_e10_e07_v1/README.md).
+See the [delivery record](../../../docs/contributions.md) for integration checks.

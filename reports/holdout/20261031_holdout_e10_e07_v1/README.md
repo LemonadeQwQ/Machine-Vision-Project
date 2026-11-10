@@ -17,5 +17,6 @@ results are descriptive comparisons, not a new external blind benchmark or
 statistical significance claim.
 
 CV results are reported [separately](../../experiments/20261031_e10/SUMMARY.md).
-B's E10 dependency and refit documentation remain separate pending deliveries;
-C's integration checks are deferred until A/B/C merge.
+E10's configuration and registration are integrated. The
+[refit summary](../../refit/20261031_e10_e07_v1/README.md) records both completed models;
+[contributions](../../../docs/contributions.md) records integration validation.

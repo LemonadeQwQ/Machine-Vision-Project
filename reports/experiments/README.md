@@ -30,5 +30,5 @@ the committed completed status is copied from accepted real runs.
 `summarize_cv.py` recomputes from local probabilities and manifests, which are
 not distributed here. Public aggregates cannot substitute for case-level inputs.
 
-This C branch defers tests to A/B/C integration; B's E10 configuration and
-registration are pending. See [contributions](../../docs/contributions.md).
+A/B/C integration now includes E10's configuration and registration. See
+[contributions](../../docs/contributions.md) for integration validation and human-review status.

@@ -4,21 +4,20 @@ Nine-class skin-lesion classification with ResNet-50, dermoscopic and clinical
 images, and controlled comparisons of class weighting, ISIC expansion, metadata
 and augmentation.
 
-## C delivery status — 2026-11-01
+## A/B/C integration — 2026-11-09
 
 All E00–E10 experiments have completed five independent folds: 55 folds in total,
 with 3,968 development cases in each pooled OOF set. E10 (primary) and E07
 (control) completed their fixed 13- and 14-epoch refits, followed by evaluation on
-the same 1,037-case holdout. This branch publishes C's aggregate results,
-evaluation documentation, result collector and protocol-test additions.
+the same 1,037-case holdout. This version includes the data/metadata acceptance,
+E10 configuration, refit documentation, aggregate results and protocol regressions.
 
-**This is a C-only delivery, pending A/B integration.** B's E10 configuration
-`configs/experiments/E10_pair_isic_weighted_metadata.yaml` and its registration in
-`src/experiment.py` are not included yet. The added E10 tests depend on those
-files; test execution and integrated CI acceptance are deferred until merge.
-A's final data/metadata documentation and B's updated training/refit guides also
-remain separate deliveries. Existing A/B guides describe the October 29 snapshot;
-use the result summaries below for current experimental status.
+A `29caf7a` (4 paths), B `ed741cb` (7 paths; PR #5), and C `89e2bc0` (76 paths)
+are integrated with their original commits and authors preserved. Integration
+resolves older documentation conflicts, retains the public evaluation interfaces,
+and updates all current completion statements. Data details are in the
+[metadata inventory](docs/metadata_inventory.md) and
+[final aggregate acceptance](reports/data_audit/20261031_final_acceptance.json).
 
 The October 28/29 deliveries and their original authors remain intact, including
 A `0bacf4a`, B `ccc10bd` and C `df34478`, integrated through
@@ -89,7 +88,7 @@ and [evaluation contract](docs/evaluation.md).
 | Path | Role / delivery owner |
 | --- | --- |
 | `src/data/`, `src/class_schema.py`, `configs/schema/` | Data, grouping and class contract — A |
-| `src/experiment.py`, `src/models/fusion.py`, `configs/experiments/` | Training and models — B; E10 registration/configuration pending |
+| `src/experiment.py`, `src/models/fusion.py`, `configs/experiments/` | Training, models and E00–E10 configurations — B |
 | `src/refit.py`, `src/infer.py` | Final refit and checkpoint inference — B |
 | `src/evaluate.py`, `src/metrics.py` | Fixed-schema evaluation and metric adapter — C |
 | `scripts/summarize_cv.py`, `scripts/collect_results.py` | OOF summary and formal result collection — C |
@@ -113,7 +112,7 @@ python -m pip install torch==2.7.1 torchvision==0.22.1 --index-url https://downl
 python -m pip install -r requirements-test.txt
 ```
 
-After B's E10 dependency is integrated, run the existing public suites:
+Run the three public offline suites from the repository root:
 
 ```powershell
 python -B -m unittest discover -s tests -p test_resnet_protocol.py -v
@@ -121,11 +120,11 @@ python -B -m unittest discover -s tests -p test_evaluation_schemas.py -v
 python -B -m unittest discover -s tests -p test_evaluate.py -v
 ```
 
-These commands are deferred integration checks, not a claim of passing on this
-C-only branch. They use artificial inputs and preserved legacy labels; they do
-not establish GPU readiness. The public-specific label defaults, two additional
-CLI regressions and existing CI are preserved. Old acceptance counts do not
-prove this new candidate passes.
+These checks use artificial inputs and preserved legacy labels; they do not
+establish GPU readiness. The public-specific label defaults, two additional CLI
+regressions and existing CI remain intact. Current integration validation is
+recorded in the [contribution record](docs/contributions.md); historical acceptance
+counts are not substituted for the new candidate's results.
 
 ## Unified evaluation
 
@@ -144,4 +143,4 @@ The existing [distribution analysis](reports/class_distribution/analysis.md)
 and [synthetic demonstration](reports/evaluation_demo/README.md) are retained.
 Their historical 11-class split (4,192 training / 1,048 validation lesions) is
 not the new nine-class protocol. Final report/reproduction work, human review,
-A/B integration and release approval remain separate completion items.
+and release approval remain separate completion items.

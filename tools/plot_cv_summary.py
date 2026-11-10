@@ -32,7 +32,10 @@ def main():
     ax.barh(y, means * 100, xerr=std * 100, color=colors, capsize=4,
             label='Five-fold mean +/- sample SD')
     ax.scatter(oof * 100, y, s=45, color='#182c3c', marker='D', zorder=4, label='Pooled OOF')
-    ax.set_yticks(y, [r['experiment'] + '  ' + r['description'] for r in data])
+    legacy_labels = {'E00': 'Dermoscopy', 'E01': 'Clinical', 'E02': 'Paired fusion'}
+    labels = [r['experiment'] + '  ' + (r.get('description') or legacy_labels.get(r['experiment'], ''))
+              for r in data]
+    ax.set_yticks(y, [label.rstrip() for label in labels])
     ax.invert_yaxis()
     ax.set_xlabel('Nine-class Macro F1 (%)')
     ax.set_xlim(0, 100)
