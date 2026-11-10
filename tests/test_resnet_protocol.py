@@ -72,7 +72,8 @@ class TestResNetProtocol(unittest.TestCase):
         comparisons = [('E00', 'E01', {'modality'}), ('E00', 'E03', {'weighted'}),
             ('E00', 'E04', {'include_isic'}), ('E03', 'E05', {'include_isic'}),
             ('E02', 'E06', {'weighted'}), ('E06', 'E07', {'include_isic'}),
-            ('E02', 'E08', {'metadata'}), ('E02', 'E09', {'augment'})]
+            ('E02', 'E08', {'metadata'}), ('E02', 'E09', {'augment'}),
+            ('E07', 'E10', {'metadata'}), ('E08', 'E10', {'include_isic', 'weighted'})]
         for a, b, expected in comparisons:
             self.assertEqual({k for k in configs[a] if k != 'experiment' and configs[a][k] != configs[b][k]}, expected)
 
@@ -229,10 +230,42 @@ class TestResNetProtocol(unittest.TestCase):
 
     def test_collector_keeps_unrun_experiments_planned(self):
         rows = collect(self.root / 'empty', self.root / 'status.csv')
-        self.assertEqual(len(rows), 50)
+        self.assertEqual(len(rows), 55)
+        self.assertEqual([r['fold'] for r in rows if r['experiment'] == 'E10'], list(range(5)))
         self.assertEqual({r['status'] for r in rows}, {'planned'})
         with self.assertRaises(FileNotFoundError):
             summarize(self.root / 'empty', ROOT / 'DATA/manifests', self.root / 'summary')
+
+    def test_e10_metadata_and_isic_missing_clinical_backward(self):
+        config = configuration(ROOT / 'configs/experiments/E10_pair_isic_weighted_metadata.yaml')
+        train = [row('train-' + c, c) for c in NINE_CLASSES]
+        isic = dict(row('isic', 'NV'), sample_id='ISIC2019:isic', source='ISIC2019',
+                    clinical_path='', has_clinical=0, age_years='60', skin_tone_class='')
+        train.append(isic)
+        encoder = fit_metadata(train)
+        self.assertEqual(encoder.age_mean, 42.)
+        self.assertNotIn('validation-only', encoder.sex_categories)
+        dataset = ManifestDataset([train[0], isic], self.root, metadata_encoder=encoder, size=32)
+        batch = next(iter(torch.utils.data.DataLoader(dataset, batch_size=2)))
+        self.assertEqual(batch['modality_mask'].tolist(), [[1., 1.], [1., 0.]])
+        self.assertEqual(batch['metadata_mask'][1].tolist(), [1., 1., 1., 0.])
+        model = ResNetExperiment(config['modality'], encoder.output_dim)
+        model.train()
+        calls = []
+        hook = model.encoders['clinical'].register_forward_hook(lambda m, i, o: calls.append(i[0].shape[0]))
+        criterion, _ = classification_loss(train, config['weighted'], 'cpu')
+        criterion(model(batch), batch['label']).backward()
+        self.assertEqual(calls, [1])
+        grad = model.metadata_encoder[0].weight.grad
+        self.assertTrue(torch.isfinite(grad).all())
+        self.assertGreater(grad.abs().sum().item(), 0)
+        model.zero_grad(set_to_none=True)
+        only_isic = {key: (value[1:] if torch.is_tensor(value) else value[1:]) for key, value in batch.items()}
+        criterion(model(only_isic), only_isic['label']).backward()
+        self.assertEqual(calls, [1])
+        self.assertTrue(all(p.grad is None for p in model.encoders['clinical'].parameters()))
+        self.assertTrue(torch.isfinite(model.metadata_encoder[0].weight.grad).all())
+        hook.remove()
 
     def test_interrupted_epoch_resume_matches_uninterrupted(self):
         for workers in (0, 4):

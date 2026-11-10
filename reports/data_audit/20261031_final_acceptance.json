@@ -1,0 +1,77 @@
+{
+  "protocol": "resnet9-v1",
+  "acceptance_date": "2026-10-31",
+  "human_review": {
+    "status": "pending"
+  },
+  "manifest_sha256": "0ee819e4fcc825834f2c99b906ac3c3f4effe7211280d544fd85ed72382a141c",
+  "populations": {
+    "milk_dev_lesions": 3968,
+    "isic_train_images": 20279,
+    "milk_holdout_lesions": 1037
+  },
+  "data_separation": {
+    "train_validation_group_overlap": 0,
+    "development_holdout_group_overlap": 0,
+    "isic_in_validation": false,
+    "isic_in_holdout": false,
+    "patient_level_independence_verified": false
+  },
+  "cross_validation": {
+    "status": "completed",
+    "experiment_count": 11,
+    "experiments": [
+      "E00",
+      "E01",
+      "E02",
+      "E03",
+      "E04",
+      "E05",
+      "E06",
+      "E07",
+      "E08",
+      "E09",
+      "E10"
+    ],
+    "folds_per_experiment": 5,
+    "total_completed_folds": 55,
+    "oof_cases_per_experiment": 3968,
+    "cv_checkpoints_verified": 110,
+    "validation_fold_replays_passed": 55,
+    "max_probability_difference": 0.0
+  },
+  "refit": {
+    "status": "completed",
+    "training_records_per_model": 24247,
+    "training_sources": {
+      "milk_dev_lesions": 3968,
+      "isic_train_images": 20279
+    },
+    "models": {
+      "E10": {
+        "role": "primary",
+        "epochs": 13
+      },
+      "E07": {
+        "role": "control",
+        "epochs": 14
+      }
+    },
+    "checkpoints_verified": 4
+  },
+  "holdout": {
+    "status": "completed",
+    "case_count_per_model": 1037,
+    "models_evaluated": [
+      "E10",
+      "E07"
+    ],
+    "same_holdout_cases": true
+  },
+  "limitations": [
+    "No patient-level independence claim",
+    "Similarity grouping is conservative, not manual duplicate confirmation",
+    "Fixed holdout has historical project use",
+    "Case-level predictions and raw images are not public"
+  ]
+}

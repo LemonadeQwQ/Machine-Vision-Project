@@ -1,23 +1,49 @@
-# 正式五折结果与公开边界
+# 正式实验结果与公开边界
 
-正式运行必须带 `protocol=resnet9-v1`、`purpose=formal`、实验编号、fold、实际配置、清单／权重哈希和源码指纹。`completed` 表示实际运行成功；fixture、smoke、资源测速和历史模型不进入本轮成绩表。
+当前真实实验为 E00～E10 共 55 折 completed，各组 OOF 恰好覆盖 3,968 例。
+E10 主模型／E07 对照 refit 已完成，固定 holdout 各 1,037 例也已评估。
+这里的 completed 描述已验收实验；A／B／C 集成检查与组员人工复核分别记录。
 
-| 产物 | 含义 |
+## 公开结果入口
+
+| 路径 | 内容 |
 |---|---|
-| `run.json`、`config.json` | 状态、来源、输入、选模规则和环境 |
-| `history.json` | 每轮损失与指标、样本顺序指纹、时间和显存 |
-| `best.pt`、`last.pt` | 最佳模型与最后完整 epoch 的恢复状态，留在集群 |
-| `predictions.csv` | 最佳 epoch 的 sample_id＋九类概率 |
-| `evaluation/` | 每折指标、每类统计及混淆矩阵 |
-| `summary/cv_summary.json` | 五折均值、样本标准差、pooled OOF、预定 refit 轮数 |
-| `summary/oof_predictions.csv` | 每个开发病例恰好一次的折外概率 |
+| `reports/experiments/experiment_status.csv` | 55 行正式运行状态，缺失运行不会由收集脚本伪造为完成 |
+| `reports/experiments/20261031_e10/summary_metrics.csv` | 全部十一组五折均值、样本标准差、pooled OOF、条件 refit 轮数 |
+| 同目录 `fold_metrics.csv` | 55 折实际 epoch、早停原因、训练／验证数量和指标 |
+| 同目录 `public_summary.json`、`SUMMARY.md`、`cv_comparison.png` | 当前公开聚合说明、训练来源指纹及比较图 |
+| 同目录 `e10_vs_e07_folds.csv`、`e10_vs_e07_per_class.csv` | 逐折与 pooled OOF 逐类对照 |
+| `reports/experiments/20261030_expansion/E03/summary/pooled_oof/` 至 `E09` | 每组逐类表与原始／归一化混淆矩阵 CSV／PNG |
+| `reports/experiments/20261031_e10/E10/summary/pooled_oof/` | E10 同类聚合表图 |
+| `reports/holdout/20261031_holdout_e10_e07_v1/` | 双模型最终总体／逐类指标及混淆矩阵，只公开聚合内容 |
 
-指标存储为 0～1；文档百分比为乘以 100 后显示。Macro F1 固定平均九类，无 support 类别仍保留；argmax 同分取类别顺序中第一类。样本标准差不是置信区间，OOF 指标不是五折均值。
+[29 日核心结果](../reports/experiments/20261029_core/SUMMARY.md) 保留原历史快照。
+最新十一组表已包含 E00～E09，不把十组旧总表再拼入造成重复；旧快照中 holdout 未执行
+是当时状态，当前状态以 [CV 摘要](../reports/experiments/20261031_e10/SUMMARY.md)
+和 [最终评估](../reports/holdout/20261031_holdout_e10_e07_v1/SUMMARY.md) 为准。
 
-`reports/experiments/20261029_core/` 下 `SUMMARY.md`、`summary_metrics.csv`、`fold_metrics.csv`、`public_summary.json` 和 `summary_comparison.png` 是可公开聚合结果。C 还可按交接清单领取 pooled OOF 的每类指标和混淆矩阵，不包含逐病例 ID 或个人部署路径。
+## 指标解释
 
-原始 run／环境／日志、逐病例预测和标签、完整 `cv_summary.json`、原始 `metrics.json` 留在 private，其中可能包含集群路径；不能整目录复制到 public。来源 SHA-256 可公开。
+分数保存为 0～1，百分比展示乘以 100。Macro F1 固定平均九类，无 support 类别仍保留；
+argmax 同分取固定类别顺序中第一类。样本标准差不是置信区间，pooled OOF 不是五折均值。
+CV 验证折参与选 epoch，属于开发选模估计；在线训练诊断不是最终测试成绩。
+只有 E10／E07 实际 refit；其他配置的预定轮数不表示已训练。
 
-`reports/experiments/experiment_status.csv` 覆盖 E00～E09 各五折。E00～E02 completed，E03～E09 planned 且成绩为空。`collect_results.py` 从完成折的概率重新计算指标；`summarize_cv.py` 拒绝缺折、混合版本、smoke 或 OOF 覆盖错误。
+## 本地完整运行产物
 
-29 日另核对 30 个 checkpoint 的轮数、优化器步数和冻结参数，并重载 15 个 best checkpoint 复算验证概率，结果一致。完整证据保存在 private preparation 记录。CV 是开发选模估计；E02 均值高于 E00 不表示完成了显著性检验。refit 和 holdout 尚未执行。组员人工复核状态与自动验收分开记录。
+| 产物 | 用途及公开处理 |
+|---|---|
+| `run.json`、`config.json`、`history.json`、`metadata.json` | 完整配置、输入、环境及训练记录留在内部 |
+| `best.pt`、`last.pt` | 权重与恢复状态不公开 |
+| `predictions.csv`、`predictions_aligned.csv`、`oof_predictions.csv` | 新逐病例概率／标签不公开 |
+| `summary/cv_summary.json` | 原始完整五折汇总留在内部；公开版仅提取允许的聚合字段 |
+| `evaluation/metrics.json` | 只发布经来源路径脱敏的最终 holdout 聚合版，保留数值／策略／来源哈希 |
+| `per_class_metrics.csv`、`confusion_matrix*.csv/png` | 允许公开的聚合结果 |
+
+`public_summary.json` 是当前状态的公开导出，不冒充训练时的原始快照。
+已脱敏 metrics JSON 与原始 JSON 不同字节；来源哈希仍标识内部保存的输入。
+源码指纹属于实际训练快照，不能替换成较晚 public 提交的哈希。
+
+收集与汇总真实运行需要本地清单和逐病例产物。仅有公开表图不能重新计算逐病例概率，
+也不能据此声称独立完整复现已经完成。组员人工复核和候选集成检查分别记录在
+[贡献说明](contributions.md)。

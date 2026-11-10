@@ -48,3 +48,14 @@ pretrained_weights/
 !/DATA/manifests/class_counts.csv
 !/DATA/manifests/summary.json
 !/DATA/manifests/version.json
+
+# C final aggregate delivery; case images and weights remain excluded.
+!reports/experiments/20261030_expansion/E0[3-9]/summary/pooled_oof/confusion_matrix.png
+!reports/experiments/20261030_expansion/E0[3-9]/summary/pooled_oof/confusion_matrix_normalized.png
+!reports/experiments/20261031_e10/E10/summary/pooled_oof/confusion_matrix.png
+!reports/experiments/20261031_e10/E10/summary/pooled_oof/confusion_matrix_normalized.png
+!reports/experiments/20261031_e10/cv_comparison.png
+!reports/holdout/20261031_holdout_e10_e07_v1/E07/evaluation/confusion_matrix.png
+!reports/holdout/20261031_holdout_e10_e07_v1/E07/evaluation/confusion_matrix_normalized.png
+!reports/holdout/20261031_holdout_e10_e07_v1/E10/evaluation/confusion_matrix.png
+!reports/holdout/20261031_holdout_e10_e07_v1/E10/evaluation/confusion_matrix_normalized.png
