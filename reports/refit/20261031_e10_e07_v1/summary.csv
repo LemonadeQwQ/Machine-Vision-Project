@@ -1,0 +1,3 @@
+experiment,role,status,epochs,train_samples,val_samples,online_train_loss,online_train_macro_f1,online_train_accuracy,holdout_evaluated
+E10,primary,completed_and_cpu_checkpoint_audited,13,24247,0,0.2567422528452654,0.8661492247408598,0.8595702561141585,True
+E07,control,completed_and_cpu_checkpoint_audited,14,24247,0,0.25874065677203034,0.8577393340436827,0.8507856642058811,True
