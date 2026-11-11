@@ -9,3 +9,10 @@ reports/experiments/experiment_status.csv -text whitespace=blank-at-eol,blank-at
 reports/experiments/20261030_expansion/E0[3-9]/summary/pooled_oof/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 reports/experiments/20261031_e10/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 reports/holdout/20261031_holdout_e10_e07_v1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve training source and attribution bytes used by source fingerprints.
+src/**/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+scripts/**/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+stages/panderm_stage/vendor/** -text
+stages/monet_stage/reference/ATTRIBUTION.md -text
+stages/monet_stage/reference/MONET_LICENSE.txt -text

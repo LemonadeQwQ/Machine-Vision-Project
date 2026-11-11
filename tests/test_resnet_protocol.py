@@ -230,7 +230,7 @@ class TestResNetProtocol(unittest.TestCase):
 
     def test_collector_keeps_unrun_experiments_planned(self):
         rows = collect(self.root / 'empty', self.root / 'status.csv')
-        self.assertEqual(len(rows), 55)
+        self.assertEqual(len(rows), 70)
         self.assertEqual([r['fold'] for r in rows if r['experiment'] == 'E10'], list(range(5)))
         self.assertEqual({r['status'] for r in rows}, {'planned'})
         with self.assertRaises(FileNotFoundError):
