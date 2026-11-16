@@ -1,8 +1,64 @@
 # 分工、实现与复核状态
 
+## 2026-11-16：E14 A/B/C 整合
+
+以 public main `196c7d0` 为基线，整合 A `c2374a4`、B `c8c9129`、C `074400f`，保留三个原始提交。共 27 个不重叠路径，分工如下。
+
+| 角色 | 路径数 | 内容 |
+|---|---:|---|
+| A | 1 | 冻结输入、缺失模态与完整训练池 refit 协议 |
+| B | 7 | 四配置、注册表、中性 Gate 初始化与训练说明 |
+| C | 19 | readiness、测试、聚合结果、CI 与共享文档 |
+
+### A 的文件
+
+- `docs/data_protocol.md`
+
+### B 的文件
+
+- `configs/experiments/E14-GP_pair_gate_panderm.yaml`
+- `configs/experiments/E14-GM_pair_gate_monet.yaml`
+- `configs/experiments/E14-PM_pair_panderm_monet.yaml`
+- `configs/experiments/E14-GPM_pair_gate_panderm_monet.yaml`
+- `src/experiment_registry.py`
+- `src/models/next_stage.py`
+- `docs/training.md`
+
+### C 的文件
+
+- `scripts/check_training_ready.py`
+- `tests/test_e11_e13.py`
+- `tests/test_resnet_protocol.py`
+- `tests/test_e14_pairs.py`
+- `tests/test_e14_gpm.py`
+- `tests/test_e14_gpm_refit.py`
+- `README.md`
+- `docs/contributions.md`
+- `docs/experiment_plan.md`
+- `docs/model_selection.md`
+- `docs/e14_pairs_implementation.md`
+- `docs/e14_gpm_implementation.md`
+- `.github/workflows/tests.yml`
+- `.gitignore`
+- `.gitattributes`
+- `reports/experiments/20261115_e11_e14_summary/SUMMARY.md`
+- `reports/experiments/20261115_e11_e14_summary/summary_metrics.csv`
+- `reports/experiments/20261115_e11_e14_summary/fold_metrics.csv`
+- `reports/experiments/20261115_e11_e14_summary/comparison_macro_f1.png`
+
+共享 README、CI、综合测试与聚合报告由 C 维护。已接入 B 的全部依赖；先前 C 单分支缺依赖的 CI 失败属于历史记录。
+
+当前整合候选的依赖预检及七组 CPU 离线测试共 **61 项通过**：协议20、schema4、评估12、E11–E13 17、pairs4、GPM3、refit1。测试直接使用本候选，没有临时覆盖 B 文件；仅人工数据，无依赖安装或真实训练。23 份共享配置／schema 与内部版本字节一致，核心模型、训练、推理与 refit 逻辑一致；8 组聚合成绩和40条逐折指标、来源哈希均精确匹配。远程 CI 以本次整合提交的实际结果为准。
+
+核心模型／配置和聚合指标与内部实现按同一协议核对；公开评估的显式 labels 规则、原有 CLI 回归及通用绘图功能保持原样。历史 GPU 训练来源与当前公开文件树的完整指纹不同，refit 的来源守卫保留。
+
+新 35 折结果沿用已记录的精简验收范围，没有宣称全部正式模型重载／重推理。GPM refit 最后保存状态为排队，本交付无新 holdout 成绩。组员本人复核仍为 pending；实现由集成人在 AI 协助下统一完成，分工表示接收／复核／提交责任。
+
+## 此前交付记录
+
 更新日期：2026-11-15。实现、运行与整理由集成人统一完成，AI 协助。A／B／C 是组员接收代码、复核和提交 public 的责任范围，不是三套独立项目，也不代表这些实现已经分别由三位组员独立完成。
 
-## 11 月 15 日 E11～E13 的 A／B／C 整合
+## 11 月 15 日 E11～E13 的 A／B／C 整合（此前交付历史）
 
 本次以 public main `cfafd05` 为共同基线，按 A → B → C 合并为同一候选，
 保留下面的原始提交和作者；没有合并 private 整仓历史或 E14 增量。

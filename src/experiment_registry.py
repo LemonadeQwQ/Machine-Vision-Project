@@ -1,12 +1,38 @@
-"""Stable experiment identities; E14 combinations are deliberately not registered yet."""
+"""Stable identities for single changes, pairs and the three-component experiment."""
+
 
 LEGACY_EXPERIMENTS = tuple(f'E{i:02}' for i in range(11))
-NEW_EXPERIMENTS = {
+
+SINGLE_EXPERIMENTS = {
     'E11': {'gate': True, 'panderm': False, 'monet': False},
     'E12': {'gate': False, 'panderm': True, 'monet': False},
     'E13': {'gate': False, 'panderm': False, 'monet': True},
 }
+
+PAIR_EXPERIMENTS = {
+    'E14-GP': {'gate': True, 'panderm': True, 'monet': False},
+    'E14-GM': {'gate': True, 'panderm': False, 'monet': True},
+    'E14-PM': {'gate': False, 'panderm': True, 'monet': True},
+}
+
+TRIPLE_EXPERIMENTS = {
+    'E14-GPM': {'gate': True, 'panderm': True, 'monet': True},
+}
+
+EXPERIMENT_GROUPS = {
+    'singles': tuple(SINGLE_EXPERIMENTS),
+    'pairs': tuple(PAIR_EXPERIMENTS),
+    'triple': tuple(TRIPLE_EXPERIMENTS)
+}
+
+NEW_EXPERIMENTS = {
+    **SINGLE_EXPERIMENTS,
+    **PAIR_EXPERIMENTS,
+    **TRIPLE_EXPERIMENTS
+}
+
 EXPERIMENTS = (*LEGACY_EXPERIMENTS, *NEW_EXPERIMENTS)
+
 NEW_DEFAULTS = {
     'gate': False, 'panderm': False, 'monet': False,
     'gate_hidden': 128, 'panderm_last_blocks': 2,

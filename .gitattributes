@@ -16,3 +16,6 @@ scripts/**/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-a
 stages/panderm_stage/vendor/** -text
 stages/monet_stage/reference/ATTRIBUTION.md -text
 stages/monet_stage/reference/MONET_LICENSE.txt -text
+
+# Preserve the approved aggregate E11-E14 publication bytes.
+reports/experiments/20261115_e11_e14_summary/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

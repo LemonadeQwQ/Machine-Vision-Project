@@ -29,9 +29,10 @@ def check(data_root=None, weights=None, output=None, experiments=None, panderm_w
         if len(paths) != 1:
             raise ValueError(f'Expected one configuration for {experiment}')
         extra = dict(overrides)
-        if experiment == 'E12' and panderm_weights is not None:
+        selected_config = configuration(paths[0], overrides)
+        if selected_config.get('panderm') and panderm_weights is not None:
             extra['panderm_weights'] = str(panderm_weights)
-        if experiment == 'E13' and monet_dir is not None:
+        if selected_config.get('monet') and monet_dir is not None:
             extra['monet_dir'] = str(monet_dir)
         config = configuration(paths[0], extra)
         # 所有实验逐折检查。对同一原图仅检查存在性，下载时完整 SHA256 已另行记录。
@@ -62,7 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('--weights', type=Path)
     parser.add_argument('--output', type=Path, default=ROOT / 'reports/preparation/readiness.json')
     parser.add_argument('--experiments', nargs='+', choices=EXPERIMENTS,
-                        help='Default remains E00-E10; E11-E13 require explicit selection')
+                        help='Default remains E00-E10; single changes, pairs and the triple require explicit selection')
     parser.add_argument('--panderm-weights', type=Path)
     parser.add_argument('--monet-dir', type=Path)
     args = parser.parse_args()

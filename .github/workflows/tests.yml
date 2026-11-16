@@ -27,6 +27,10 @@ jobs:
               'configs/experiments/E11_pair_gate.yaml',
               'configs/experiments/E12_pair_panderm.yaml',
               'configs/experiments/E13_pair_monet.yaml',
+              'configs/experiments/E14-GP_pair_gate_panderm.yaml',
+              'configs/experiments/E14-GM_pair_gate_monet.yaml',
+              'configs/experiments/E14-PM_pair_panderm_monet.yaml',
+              'configs/experiments/E14-GPM_pair_gate_panderm_monet.yaml',
               'stages/panderm_stage/vendor/modeling_finetune.py',
               'stages/panderm_stage/vendor/SOURCE.md',
               'stages/monet_stage/reference/ATTRIBUTION.md',
@@ -39,11 +43,22 @@ jobs:
                            if isinstance(node, ast.FunctionDef)}
               if 'training_source_files' not in functions:
                   missing.append('A update: src/data/common.py::training_source_files')
+          registry = Path('src/experiment_registry.py')
+          if registry.is_file():
+              assignments = {node.targets[0].id: node.value
+                             for node in ast.parse(registry.read_text(encoding='utf-8')).body
+                             if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name)}
+              for name, expected in (
+                  ('PAIR_EXPERIMENTS', {'E14-GP', 'E14-GM', 'E14-PM'}),
+                  ('TRIPLE_EXPERIMENTS', {'E14-GPM'}),
+              ):
+                  if name not in assignments or set(ast.literal_eval(assignments[name])) != expected:
+                      missing.append('B E14 registry: ' + name)
           schema = Path('src/class_schema.py').read_text(encoding='utf-8')
           if 'NINE_CLASSES' not in schema or 'validate_class_order' not in schema:
               missing.append('updated src/class_schema.py')
           if missing:
-              print('::error::Missing protocol dependencies (E11-E13 require A/B integration): ' + ', '.join(missing))
+              print('::error::Missing protocol dependencies: ' + ', '.join(missing))
               raise SystemExit(1)
           PY
       - name: Install CPU PyTorch
@@ -56,6 +71,9 @@ jobs:
           python -B -m unittest discover -s tests -p test_evaluation_schemas.py -v
           python -B -m unittest discover -s tests -p test_evaluate.py -v
           python -B -m unittest discover -s tests -p test_e11_e13.py -v
+          python -B -m unittest discover -s tests -p test_e14_pairs.py -v
+          python -B -m unittest discover -s tests -p test_e14_gpm.py -v
+          python -B -m unittest discover -s tests -p test_e14_gpm_refit.py -v
         env:
           HF_HUB_OFFLINE: '1'
           TRANSFORMERS_OFFLINE: '1'

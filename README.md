@@ -4,7 +4,15 @@ Nine-class skin-lesion classification with ResNet-50, dermoscopic and clinical
 images, and controlled comparisons of class weighting, ISIC expansion, metadata
 and augmentation.
 
-## E11–E13 A/B/C integration — 2026-11-15
+## E14 A/B/C integration and aggregate results — 2026-11-16
+
+This version integrates A's input protocol, B's four E14 configurations and model changes, and C's readiness adaptation, pair/triple/refit tests, public documentation and [aggregate E11–E14 results](reports/experiments/20261115_e11_e14_summary/SUMMARY.md). All 35 new CV folds completed under their recorded training snapshots. GPM ranks first by mean macro F1 (61.09%), but its advantage over E12 is only 0.57 percentage points and 2/5 paired folds; superiority remains uncertain. The selected 46-epoch refit was last observed queued, with actual start unconfirmed and no new holdout result.
+
+The four E14 configurations, grouped registry and neutral Gate initialization fix are integrated. CI checks their dependencies and runs seven offline test suites. See the [pair contract](docs/e14_pairs_implementation.md), [GPM/refit contract](docs/e14_gpm_implementation.md), and [exact A/B/C delivery responsibilities](docs/contributions.md).
+
+No new case-level records, trained models, cluster scripts, accounts or raw logs are published. Existing public evaluation interfaces and historical authors remain intact.
+
+## Previous E11–E13 A/B/C integration — 2026-11-15
 
 This version integrates A's source provenance helper, B's model and training
 interfaces, and C's collection, CV checks, readiness checks and 17 synthetic tests. E11 adds a
@@ -18,8 +26,8 @@ running all four offline suites. GPU readiness and formal training results
 require their own run-specific evidence.
 
 See the [E11–E13 contract and dependency list](docs/e11_e13_implementation.md)
-and [the A/B/C delivery record](docs/contributions.md). This integration includes
-no new E11–E13 training results. The completed results below remain E00–E10.
+and [the A/B/C delivery record](docs/contributions.md). That earlier integration included
+no new E11–E13 training results; the later C delivery above adds their aggregate evidence. The older results below remain E00–E10.
 
 ## A/B/C integration — 2026-11-09
 
@@ -129,7 +137,7 @@ python -m pip install torch==2.7.1 torchvision==0.22.1 --index-url https://downl
 python -m pip install -r requirements-test.txt
 ```
 
-Run the three existing offline suites and the new E11–E13 suite
+After the documented B dependencies have been integrated, run all seven public offline suites
 from the repository root:
 
 ```powershell
@@ -137,6 +145,9 @@ python -B -m unittest discover -s tests -p test_resnet_protocol.py -v
 python -B -m unittest discover -s tests -p test_evaluation_schemas.py -v
 python -B -m unittest discover -s tests -p test_evaluate.py -v
 python -B -m unittest discover -s tests -p test_e11_e13.py -v
+python -B -m unittest discover -s tests -p test_e14_pairs.py -v
+python -B -m unittest discover -s tests -p test_e14_gpm.py -v
+python -B -m unittest discover -s tests -p test_e14_gpm_refit.py -v
 ```
 
 These checks use artificial inputs and preserved legacy labels; they do not

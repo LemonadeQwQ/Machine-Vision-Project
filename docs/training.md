@@ -177,4 +177,61 @@ Fixed holdout inference continues to require a completed development-refit check
 
 E11–E13 implementations and configurations are integrated with the public data and evaluation interfaces. Offline validation of this public candidate is recorded in [the contribution record](contributions.md). This integration does not claim GPU validation of the exact public source tree.
 
-Formal E11–E13 five-fold CV results are not included in this public delivery. The completed E00–E10 results and earlier refit and holdout evaluations remain unchanged.
+Aggregate E11–E14 five-fold results are included in the [result summary](../reports/experiments/20261115_e11_e14_summary/SUMMARY.md). The completed E00–E10 results and earlier refit and holdout evaluations remain unchanged.
+
+## E14: Pairwise and Three-Component Experiments
+
+E14 extends the existing E11-E13 model family by testing combinations of Gate, PanDerm, and MONET.
+
+| Experiment | Gate | PanDerm | MONET |
+|---|---|---|---|
+| E14-GP | Yes | Yes | No |
+| E14-GM | Yes | No | Yes |
+| E14-PM | No | Yes | Yes |
+| E14-GPM | Yes | Yes | Yes |
+
+All four configurations use the frozen nine-class data protocol, paired-image setting, training-only ISIC extension, metadata inputs, and class-weighted loss.
+
+The pairwise experiments and the three-component experiment have separate identities. The `singles`, `pairs`, and `triple` groups are defined in `src/experiment_registry.py`.
+
+Each fold starts independently from the required pretrained components, without reusing weights trained by another experiment or fold.
+
+### Model Initialization
+
+The neutral Gate initialization preserves the corresponding ungated model's initial behaviour. The Gate is initialized after the MONET and concept-projection components when applicable.
+
+The existing missing-clinical-image handling and frozen MONET encoder are retained.
+
+### Cross-Validation Interface
+
+The four configurations are located in `configs/experiments/`.
+
+Training uses the existing `src.cross_validate` interface with the appropriate configuration, data root, and pretrained component paths.
+
+The external PanDerm weights are provided through `--panderm-weights`, and MONET assets through `--monet-dir`. These files are not distributed in the public repository.
+
+The frozen five-fold data splits and nine-class mean Macro-F1 evaluation protocol remain unchanged.
+
+### General Refit Interface
+
+After a configuration has completed formal five-fold cross-validation, the existing summarization command produces its verified `cv_summary.json`.
+
+The general refit entry point is:
+
+```bash
+python -m src.refit \
+  --cv-summary PATH_TO_COMPLETED_CV_SUMMARY.json \
+  --output NEW_REFIT_OUTPUT_DIR
+```
+
+Refit requires a completed formal five-fold summary and uses the recorded configuration, source identity, pretrained components, and predetermined epoch count.
+
+A new output directory must be used. Refit must not be started from an unrelated fold checkpoint or an earlier experiment's trained weights.
+
+### Results and Reproducibility
+
+Aggregate experiment results are integrated in the [result summary](../reports/experiments/20261115_e11_e14_summary/SUMMARY.md).
+
+The public source and documentation describe the supported model configurations and interfaces. They do not claim that the public file tree is byte-for-byte identical to the historical GPU training snapshots.
+
+Private case-level data, pretrained model weights, cluster scheduling scripts, and internal execution records are not included in this release.
