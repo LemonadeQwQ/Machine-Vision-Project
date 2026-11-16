@@ -6,13 +6,13 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.data.common import write_csv
+from src.experiment_registry import EXPERIMENTS, validate_run_identity
 
 
 def collect(root, output):
     root, output = Path(root), Path(output)
     rows = []
-    for index in range(11):
-        experiment = f'E{index:02}'
+    for experiment in EXPERIMENTS:
         for fold in range(5):
             file = root / experiment / f'fold_{fold}' / 'run.json'
             row = {'experiment': experiment, 'fold': fold, 'status': 'planned', 'best_macro_f1': '', 'best_epoch': '', 'reason': 'not started'}
@@ -22,6 +22,9 @@ def collect(root, output):
                     raise ValueError(f'Not a traceable formal result: {file}')
                 if run['experiment'] != experiment or run['fold'] != fold:
                     raise ValueError('Result stored under wrong experiment/fold')
+                if run.get('phase', 'cross_validation') != 'cross_validation':
+                    raise ValueError('Refit is not a CV fold')
+                validate_run_identity(run)
                 row.update(status=run['status'], reason=run.get('error') or run.get('stop_reason') or '')
                 if run['status'] == 'completed':
                     from src.evaluate import load_evaluation_data, calculate_metrics

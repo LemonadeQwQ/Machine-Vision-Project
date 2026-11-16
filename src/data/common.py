@@ -48,6 +48,20 @@ def fingerprint(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
+def training_source_files(root=ROOT):
+    """Hash actual executable sources, including the vendored foundation adapter."""
+    root = Path(root)
+    files = {p.relative_to(root).as_posix(): digest(p) for folder in ('src', 'scripts')
+             for p in sorted((root / folder).rglob('*.py'))}
+    if (root / 'src/models/foundation.py').is_file():
+        for relative in ('stages/panderm_stage/vendor/modeling_finetune.py',
+                         'stages/panderm_stage/vendor/SOURCE.md',
+                         'stages/monet_stage/reference/ATTRIBUTION.md',
+                         'stages/monet_stage/reference/MONET_LICENSE.txt'):
+            files[relative] = digest(root / relative)
+    return files
+
+
 def unique(rows, key):
     result = {r[key]: r for r in rows}
     if len(result) != len(rows) or '' in result:

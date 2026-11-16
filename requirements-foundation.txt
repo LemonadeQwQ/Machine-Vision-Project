@@ -1,0 +1,12 @@
+# Optional E12/E13 dependencies for a separately prepared model environment.
+# These pins define adapter compatibility, not evidence of GPU validation.
+# Use torch==2.7.1 / torchvision==0.22.1 for the shared training protocol.
+# Prepare an isolated environment; preserve environments used by earlier runs.
+# Offline synthetic tests do not require local CUDA or pretrained model downloads.
+
+timm==0.9.16
+transformers==4.46.3
+tokenizers==0.20.3
+huggingface-hub==0.26.2
+safetensors==0.4.5
+regex==2024.11.6

@@ -4,6 +4,23 @@ Nine-class skin-lesion classification with ResNet-50, dermoscopic and clinical
 images, and controlled comparisons of class weighting, ISIC expansion, metadata
 and augmentation.
 
+## E11–E13 A/B/C integration — 2026-11-15
+
+This version integrates A's source provenance helper, B's model and training
+interfaces, and C's collection, CV checks, readiness checks and 17 synthetic tests. E11 adds a
+modality gate to E10; E12 replaces its dermoscopic encoder with PanDerm; E13
+adds frozen MONET concepts. These are three independent comparisons.
+
+A/B/C's original commits and authors are preserved. The registry, model adapters,
+configurations, source-fingerprint helper and third-party notices are integrated
+with the existing public evaluation interfaces. CI checks dependencies before
+running all four offline suites. GPU readiness and formal training results
+require their own run-specific evidence.
+
+See the [E11–E13 contract and dependency list](docs/e11_e13_implementation.md)
+and [the A/B/C delivery record](docs/contributions.md). This integration includes
+no new E11–E13 training results. The completed results below remain E00–E10.
+
 ## A/B/C integration — 2026-11-09
 
 All E00–E10 experiments have completed five independent folds: 55 folds in total,
@@ -76,7 +93,7 @@ deleted. Official tables lack patient IDs, so patient-level separation is not
 established. The inherited holdout has historical exposure and is not a
 never-used external blind test.
 
-Each fold starts independently from ImageNet V2, runs at most 100 epochs,
+For E00–E10, each fold starts independently from ImageNet V2, runs at most 100 epochs,
 selects validation Macro F1 with earliest-epoch tie handling, and stops after
 15 epochs without improvement. Refit uses the median of the five best epochs.
 See the [CV protocol](docs/cross_validation.md),
@@ -112,12 +129,14 @@ python -m pip install torch==2.7.1 torchvision==0.22.1 --index-url https://downl
 python -m pip install -r requirements-test.txt
 ```
 
-Run the three public offline suites from the repository root:
+Run the three existing offline suites and the new E11–E13 suite
+from the repository root:
 
 ```powershell
 python -B -m unittest discover -s tests -p test_resnet_protocol.py -v
 python -B -m unittest discover -s tests -p test_evaluation_schemas.py -v
 python -B -m unittest discover -s tests -p test_evaluate.py -v
+python -B -m unittest discover -s tests -p test_e11_e13.py -v
 ```
 
 These checks use artificial inputs and preserved legacy labels; they do not

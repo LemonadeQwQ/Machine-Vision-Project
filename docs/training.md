@@ -109,3 +109,72 @@ python -m src.evaluate --class-schema 9 --id-column sample_id   --labels "$MANIF
 推理拒绝普通 fold／未完成 refit 的 checkpoint，复用训练侧元数据，并核对冻结 holdout 哈希。
 本轮两模型角色在 holdout 前固定，结果不用于调参、选轮数或交换主模型／对照。
 [评估约定](evaluation.md) 保留 public 显式 labels 要求；新逐病例输出不能随公开交付上传。
+
+
+## E11–E13: Additional Model Experiments
+
+E11, E12, and E13 are three independent extensions of E10. They use the same nine-class task, frozen data splits, ISIC training pool, metadata protocol, and class-weighted loss.
+
+| Experiment | Configuration | Main change |
+|---|---|---|
+| E11 | `E11_pair_gate.yaml` | Learnable feature gate |
+| E12 | `E12_pair_panderm.yaml` | PanDerm dermoscopic encoder |
+| E13 | `E13_pair_monet.yaml` | Frozen MONET concept features |
+
+E11 introduces a learnable gate with neutral initialization, preserving the original feature-fusion output at initialization.
+
+E12 replaces the dermoscopic ResNet-50 encoder with PanDerm. The clinical ResNet-50 encoder is retained. Only the final two PanDerm blocks and final normalization are fine-tuned.
+
+E13 retains both ResNet-50 encoders and adds four groups of MONET concept scores. The MONET model remains frozen, and its concept features are computed from the same augmented dermoscopic image used by the classifier.
+
+These changes are evaluated independently. E14, the combined model, is not included in this delivery.
+
+### Optional Dependencies and Weights
+
+The optional dependencies for PanDerm and MONET are listed in `requirements-foundation.txt`.
+
+PanDerm and MONET require separately acquired, pinned model weights. These weights are not included in the public repository.
+
+The model adapters verify the expected third-party source and weight identities. Missing or mismatched model assets are rejected.
+
+### Training Interface
+
+The following commands illustrate the public training interface. Replace the data, weight, and output paths with paths from your own environment.
+
+```bash
+python -m src.cross_validate \
+  --config configs/experiments/E11_pair_gate.yaml \
+  --output OUTPUT_DIR/E11 \
+  --data-root DATA_ROOT \
+  --weights RESNET_WEIGHTS
+
+python -m src.cross_validate \
+  --config configs/experiments/E12_pair_panderm.yaml \
+  --output OUTPUT_DIR/E12 \
+  --data-root DATA_ROOT \
+  --weights RESNET_WEIGHTS \
+  --panderm-weights PANDERM_WEIGHTS
+
+python -m src.cross_validate \
+  --config configs/experiments/E13_pair_monet.yaml \
+  --output OUTPUT_DIR/E13 \
+  --data-root DATA_ROOT \
+  --weights RESNET_WEIGHTS \
+  --monet-dir MONET_MODEL_DIR
+```
+
+Each experiment uses the established five-fold protocol. Each fold starts from an independent model initialization, with no weights inherited from another fold or experiment.
+
+### Checkpoint and Inference
+
+The model factory supports the E11–E13 checkpoint format while retaining compatibility with existing E00–E10 checkpoints.
+
+MONET model files may be relocated only when their identities match the checkpoint's recorded component information.
+
+Fixed holdout inference continues to require a completed development-refit checkpoint.
+
+### Current Status
+
+E11–E13 implementations and configurations are integrated with the public data and evaluation interfaces. Offline validation of this public candidate is recorded in [the contribution record](contributions.md). This integration does not claim GPU validation of the exact public source tree.
+
+Formal E11–E13 five-fold CV results are not included in this public delivery. The completed E00–E10 results and earlier refit and holdout evaluations remain unchanged.
