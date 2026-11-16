@@ -68,7 +68,7 @@ class TestResNetProtocol(unittest.TestCase):
             _ = mapping['ISIC2019', 'NEW']
 
     def test_experiment_variable_isolation(self):
-        configs = {p.stem[:3]: configuration(p) for p in (ROOT / 'configs/experiments').glob('E*.yaml')}
+        configs = {p.stem.split('_')[0]: configuration(p) for p in (ROOT / 'configs/experiments').glob('E*.yaml')}
         comparisons = [('E00', 'E01', {'modality'}), ('E00', 'E03', {'weighted'}),
             ('E00', 'E04', {'include_isic'}), ('E03', 'E05', {'include_isic'}),
             ('E02', 'E06', {'weighted'}), ('E06', 'E07', {'include_isic'}),
@@ -230,7 +230,7 @@ class TestResNetProtocol(unittest.TestCase):
 
     def test_collector_keeps_unrun_experiments_planned(self):
         rows = collect(self.root / 'empty', self.root / 'status.csv')
-        self.assertEqual(len(rows), 70)
+        self.assertEqual(len(rows), 90)
         self.assertEqual([r['fold'] for r in rows if r['experiment'] == 'E10'], list(range(5)))
         self.assertEqual({r['status'] for r in rows}, {'planned'})
         with self.assertRaises(FileNotFoundError):
