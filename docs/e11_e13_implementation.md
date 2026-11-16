@@ -1,20 +1,21 @@
 # E11～E13 公开实现契约与 C 交付
 
-更新日期：2026-11-10。本文件说明 C 的公开增量及其要求的 A／B 接口。
-**当前分支缺少 A／B 新依赖，尚不能独立运行新检查或实验。** 完整离线测试和人工复核待整合；
-本次没有发布 E11～E13 正式成绩，不以历史 Gate／PanDerm／MONET 记录替代新结果。
+更新日期：2026-11-15。本文件说明已整合的 A／B／C 公开实现契约。
+A 的来源函数、B 的模型与训练接口、C 的检查和说明已进入同一候选版本，原提交与作者保留。
+本次交付不附 E11～E13 正式 CV 成绩；这不是全项目尚未训练的声明，
+也不以历史 Gate／PanDerm／MONET 记录替代新结果。人工复核状态另列。
 精确的 C 文件清单见 [贡献说明](contributions.md)，历史结果见 [实验计划](experiment_plan.md)。
 
-## 必须一起整合的依赖
+## 已一起整合的依赖
 
-| 负责人 | 文件／接口 | 本次 C 分支的边界 |
+| 负责人 | 文件／接口 | 本次公开交付 |
 |---|---|---|
 | A | `src/data/common.py` 的 `training_source_files()`；`docs/data_protocol.md` | A 提交源码指纹与数据说明；C 不覆盖 |
 | B | `src/experiment_registry.py` | E00～E13 注册、单一增量身份与 run 契约验证 |
 | B | `src/models/factory.py`、`src/models/foundation.py`、`src/models/next_stage.py` | 工厂、v2 checkpoint、Gate／PanDerm／MONET 接入 |
 | B | `configs/experiments/E11_pair_gate.yaml`、`E12_pair_panderm.yaml`、`E13_pair_monet.yaml`（同目录） | 三份独立配置 |
 | B | `src/experiment.py`、`src/infer.py`、`src/cross_validate.py` | 在既有文件中接入新工厂、来源记录与恢复／推理 |
-| B | `requirements-foundation.txt` | 固定基础模型接入依赖 |
+| B | `requirements-foundation.txt`、`docs/training.md` | 固定基础模型接入依赖和公开训练说明 |
 | B | `stages/panderm_stage/vendor/modeling_finetune.py`、`stages/panderm_stage/vendor/SOURCE.md` | vendored PanDerm 实现及来源记录 |
 | B | `stages/monet_stage/reference/ATTRIBUTION.md`、`stages/monet_stage/reference/MONET_LICENSE.txt` | MONET 来源和许可 |
 
@@ -76,7 +77,7 @@ E13 不重复保存冻结的 MONET 视觉／投影权重，恢复时仍需对应
 
 ## C 的检查和汇总接口
 
-以下命令仅在 A／B 已整合、数据和固定资产已在用户自己的环境准备好后使用。
+以下命令要求数据和固定资产已在用户自己的环境准备好。
 路径均为示例；检查或汇总会写入指定的新输出，不能覆盖历史记录。
 
 ```bash
@@ -103,6 +104,6 @@ v2 保存加载、三组训练接口到推理、E13 中断恢复一致性、收�
 包含 vendored PanDerm 的随机初始化检查，不下载官方权重、不使用真实病例。
 私有集群启动守卫不在公开测试中，也没有永久 skip 占位。
 
-整合后运行 README 列出的全部四组离线测试。当前 C 分支缺少 A／B 依赖，
-仅完成无需落盘材料的静态和内存检查；不宣称完整离线集成测试或 GPU 检查通过。
-既往测试通过数量不能作为这个分支的验证结果，组员人工复核仍待完成。
+本次整合的四组离线测试共 53 项通过：协议 20、schema 4、原评估 12、E11～E13 17。
+这些检查验证公开代码的合成输入行为，不宣称该公开源码版本完成 GPU 验证。
+远程 CI 以整合 PR 的实际提交为准；组员人工复核仍待完成。

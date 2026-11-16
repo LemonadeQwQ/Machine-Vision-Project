@@ -175,6 +175,6 @@ Fixed holdout inference continues to require a completed development-refit check
 
 ### Current Status
 
-E11–E13 implementations and configurations have been prepared and checked using offline and preliminary GPU validation.
+E11–E13 implementations and configurations are integrated with the public data and evaluation interfaces. Offline validation of this public candidate is recorded in [the contribution record](contributions.md). This integration does not claim GPU validation of the exact public source tree.
 
-Formal five-fold CV results are not yet claimed in this documentation. The completed E00–E10 results and earlier refit and holdout evaluations remain unchanged.
+Formal E11–E13 five-fold CV results are not included in this public delivery. The completed E00–E10 results and earlier refit and holdout evaluations remain unchanged.

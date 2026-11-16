@@ -4,22 +4,21 @@ Nine-class skin-lesion classification with ResNet-50, dermoscopic and clinical
 images, and controlled comparisons of class weighting, ISIC expansion, metadata
 and augmentation.
 
-## C's E11–E13 contribution — 2026-11-10
+## E11–E13 A/B/C integration — 2026-11-15
 
-This branch adds C's result collection, CV provenance checks, readiness checks,
-17 synthetic E11–E13 tests, and public integration documentation. E11 adds a
+This version integrates A's source provenance helper, B's model and training
+interfaces, and C's collection, CV checks, readiness checks and 17 synthetic tests. E11 adds a
 modality gate to E10; E12 replaces its dermoscopic encoder with PanDerm; E13
 adds frozen MONET concepts. These are three independent comparisons.
 
-**A/B integration is pending.** The new registry, model implementations,
-configurations, source-fingerprint helper and third-party notices are not yet
-in the public baseline. The changed C scripts and protocol tests depend on
-them; this branch is not a standalone runnable integration. CI reports the
-missing dependencies before installing packages. It must pass the full suites
-after integration; no tests are skipped to mark this contribution green.
+A/B/C's original commits and authors are preserved. The registry, model adapters,
+configurations, source-fingerprint helper and third-party notices are integrated
+with the existing public evaluation interfaces. CI checks dependencies before
+running all four offline suites. GPU readiness and formal training results
+require their own run-specific evidence.
 
 See the [E11–E13 contract and dependency list](docs/e11_e13_implementation.md)
-and [C's exact delivery list](docs/contributions.md). This contribution includes
+and [the A/B/C delivery record](docs/contributions.md). This integration includes
 no new E11–E13 training results. The completed results below remain E00–E10.
 
 ## A/B/C integration — 2026-11-09
@@ -130,8 +129,8 @@ python -m pip install torch==2.7.1 torchvision==0.22.1 --index-url https://downl
 python -m pip install -r requirements-test.txt
 ```
 
-After the A/B prerequisites above are integrated, run the three existing public
-offline suites and the new E11–E13 suite from the repository root:
+Run the three existing offline suites and the new E11–E13 suite
+from the repository root:
 
 ```powershell
 python -B -m unittest discover -s tests -p test_resnet_protocol.py -v

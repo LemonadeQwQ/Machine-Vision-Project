@@ -1,8 +1,8 @@
-# Optional E12/E13 dependencies for a separately prepared Nibi Python 3.11 environment.
-# This is a candidate lock, not evidence of an installed/validated GPU runtime.
-# Keep the existing validated torch==2.7.1 / torchvision==0.22.1 pair.
-# Do not install into or upgrade the accepted legacy environment in place.
-# No local CUDA/GPU environment is required or prepared for this task.
+# Optional E12/E13 dependencies for a separately prepared model environment.
+# These pins define adapter compatibility, not evidence of GPU validation.
+# Use torch==2.7.1 / torchvision==0.22.1 for the shared training protocol.
+# Prepare an isolated environment; preserve environments used by earlier runs.
+# Offline synthetic tests do not require local CUDA or pretrained model downloads.
 
 timm==0.9.16
 transformers==4.46.3
