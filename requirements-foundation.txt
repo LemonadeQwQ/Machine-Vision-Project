@@ -1,0 +1,12 @@
+# Optional E12/E13 dependencies for a separately prepared Nibi Python 3.11 environment.
+# This is a candidate lock, not evidence of an installed/validated GPU runtime.
+# Keep the existing validated torch==2.7.1 / torchvision==0.22.1 pair.
+# Do not install into or upgrade the accepted legacy environment in place.
+# No local CUDA/GPU environment is required or prepared for this task.
+
+timm==0.9.16
+transformers==4.46.3
+tokenizers==0.20.3
+huggingface-hub==0.26.2
+safetensors==0.4.5
+regex==2024.11.6

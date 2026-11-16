@@ -12,12 +12,21 @@ if __name__ == '__main__':
     parser.add_argument('--folds', nargs='+', type=int, default=list(range(5)))
     parser.add_argument('--data-root')
     parser.add_argument('--weights')
+    parser.add_argument('--panderm-weights')
+    parser.add_argument('--monet-dir')
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--smoke', action='store_true')
     args = parser.parse_args()
     if len(set(args.folds)) != len(args.folds) or any(i not in range(5) for i in args.folds):
         parser.error('Use unique fold numbers 0..4')
-    overrides = {k: v for k, v in {'data_root': args.data_root, 'weights': args.weights}.items() if v is not None}
+    overrides = {
+        k: v for k, v in {
+            'data_root': args.data_root,
+            'weights': args.weights,
+            'panderm_weights': args.panderm_weights,
+            'monet_dir': args.monet_dir
+        }.items() if v is not None
+    }
     config = configuration(args.config, overrides)
     for fold in args.folds:
         target = args.output / f'fold_{fold}'
