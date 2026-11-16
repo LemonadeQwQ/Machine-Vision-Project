@@ -1,0 +1,9 @@
+experiment: E11
+modality: pair
+weighted: true
+include_isic: true
+metadata: true
+gate: true
+panderm: false
+monet: false
+gate_hidden: 128

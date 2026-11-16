@@ -9,9 +9,10 @@ from .data.manifest import validate_rows
 from .experiment import configure_runtime, epoch, image_root, load_checkpoint, loader, predictions, resolve
 from .metadata_features import MetadataEncoder
 from .models.fusion import ResNetExperiment
+from .models.factory import build_model, prepare_model, restore_model
 
 
-def predict(checkpoint_path, manifest, output, *, data_root=None, workers=None, device_name='cuda'):
+def predict(checkpoint_path, manifest, output, *, data_root=None, workers=None, device_name='cuda', monet_dir=None):
     output = Path(output)
     if output.exists():
         raise FileExistsError(output)
@@ -30,13 +31,19 @@ def predict(checkpoint_path, manifest, output, *, data_root=None, workers=None, 
         if digest(directory / 'version.json') != checkpoint['inputs']['manifest_sha256'] or digest(manifest) != version['files']['milk_holdout.csv']:
             raise ValueError('Fixed holdout manifest differs from frozen protocol')
     encoder = MetadataEncoder.from_dict(checkpoint['metadata']) if checkpoint['metadata'] else None
-    model = ResNetExperiment(config['modality'], encoder.output_dim if encoder else 0)
-    model.load_state_dict(checkpoint['model'], strict=True)
+
+    model = build_model(
+        config,
+        encoder.output_dim if encoder else 0,
+        components=checkpoint['inputs'].get('components'),
+        monet_dir=monet_dir,
+        legacy_constructor=ResNetExperiment
+    )
+    restore_model(model, checkpoint['model'], config)
+
     device = torch.device(device_name)
     configure_runtime(config, device)
-    model.to(device)
-    if config['channels_last']:
-        model.to(memory_format=torch.channels_last)
+    prepare_model(model, config, device)
     data = loader(rows, config, encoder, False, device)
     result = epoch(model, data, torch.nn.CrossEntropyLoss(), config, device)
     if result['ids'] != [r['sample_id'] for r in rows]:
@@ -52,6 +59,17 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--data-root')
     parser.add_argument('--workers', type=int)
+    parser.add_argument(
+        '--monet-dir',
+        help='Relocate pinned MONET files; content must match the checkpoint'
+    )
     args = parser.parse_args()
-    result = predict(args.checkpoint, args.manifest, args.output, data_root=args.data_root, workers=args.workers)
+    result = predict(
+        args.checkpoint,
+        args.manifest,
+        args.output,
+        data_root=args.data_root,
+        workers=args.workers,
+        monet_dir=args.monet_dir
+    )
     print(f"Exported {len(result['ids'])} samples to {args.output}")

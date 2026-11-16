@@ -18,40 +18,65 @@ import torchvision
 import yaml
 
 from .class_schema import NINE_CLASSES
-from .data.common import ROOT, digest, fingerprint, read_csv, write_csv, write_json
+from .data.common import ROOT, digest, fingerprint, read_csv, write_csv, write_json, training_source_files
 from .data.manifest import ManifestDataset, assert_disjoint, fit_metadata, validate_rows
 from .evaluate import calculate_metrics, evaluate_files
 from .losses import classification_loss
 from .models.fusion import ResNetExperiment
+from .experiment_registry import NEW_DEFAULTS, is_new, validate_identity
+from .models.factory import (
+    NEW_CHECKPOINT_FORMAT,
+    build_model,
+    checkpoint_state,
+    model_contract,
+    prepare_model,
+    restore_model,
+    text_features_digest
+)
+from .models.foundation import component_assets, foundation_environment
 
 PREPROCESS = {'version': 1, 'resize': 'aspect-preserving pad to square; bilinear; black padding',
               'normalization': 'ImageNet RGB mean/std', 'geometry': 'train: shared H/V flip p=.5 and rotation U(-20,20); val: none'}
 
 
+
 def configuration(path, overrides=None):
     base = yaml.safe_load((ROOT / 'configs/experiments/base.yaml').read_text(encoding='utf-8'))
     supplied = yaml.safe_load(Path(path).read_text(encoding='utf-8'))
+
+    if not isinstance(supplied, dict):
+        raise ValueError('Configuration must be a mapping')
+    if is_new(supplied):
+        base.update(NEW_DEFAULTS)
+
     unknown = supplied.keys() - (base.keys() | {'experiment'})
     if unknown:
         raise ValueError(f'Unknown configuration keys: {unknown}')
     base.update(supplied)
+
     if overrides:
         if overrides.keys() - base.keys():
             raise ValueError('Unknown override')
         base.update(overrides)
-    if base['protocol'] != 'resnet9-v1' or base.get('experiment') not in [f'E{i:02}' for i in range(11)]:
-        raise ValueError('Unknown protocol / experiment')
+
+    validate_identity(base)
+
     if base['modality'] not in ('derm', 'clinical', 'pair') or (base['metadata'] and base['modality'] != 'pair'):
         raise ValueError('Invalid model configuration')
+
     for field in ('seed', 'max_epochs', 'patience', 'image_size', 'batch_size', 'cpu_threads', 'prefetch_factor'):
         if not isinstance(base[field], int) or base[field] < (0 if field == 'seed' else 1):
             raise ValueError(f'Invalid {field}')
+
     if base['workers'] < 0 or base['amp'] not in ('bf16', 'off'):
         raise ValueError('Invalid compute setting')
+
     for field in ('weighted', 'include_isic', 'metadata', 'augment', 'channels_last', 'tf32'):
         if not isinstance(base[field], bool):
             raise ValueError(f'{field} must be a boolean')
+
     return base
+
 
 
 def resolve(value):
@@ -64,8 +89,7 @@ def image_root(config):
 
 
 def code_record():
-    files = {p.relative_to(ROOT).as_posix(): digest(p) for folder in ('src', 'scripts')
-             for p in sorted((ROOT / folder).rglob('*.py'))}
+    files = training_source_files(ROOT)
     proc = subprocess.run(['git', '-c', f'safe.directory={ROOT.as_posix()}', '-C', str(ROOT), 'rev-parse', 'HEAD'], capture_output=True, text=True)
     commit = proc.stdout.strip() if proc.returncode == 0 else None
     if commit is None:
@@ -77,6 +101,7 @@ def code_record():
 
 
 def preflight(config, fold, *, verify_images=True):
+    validate_identity(config)
     if fold not in range(5):
         raise ValueError('Fold must be 0..4')
     directory = resolve(config['manifests'])
@@ -99,8 +124,17 @@ def preflight(config, fold, *, verify_images=True):
     weights = json.loads((ROOT / 'configs/schema/pretrained_weights.json').read_text())
     if digest(resolve(config['weights'])) != weights['sha256']:
         raise ValueError('ImageNet weights mismatch')
-    return train, val, {'manifest_sha256': digest(directory / 'version.json'),
-                        'weights_sha256': weights['sha256'], 'fold': fold}
+    inputs = {
+        'manifest_sha256': digest(directory / 'version.json'),
+        'weights_sha256': weights['sha256'],
+        'fold': fold
+    }
+    if is_new(config):
+        inputs['components'] = {
+            'resnet': {'sha256': weights['sha256']},
+            **component_assets(config)
+        }
+    return train, val, inputs
 
 
 def configure_runtime(config, device):
@@ -164,6 +198,7 @@ def epoch(model, data, criterion, config, device, optimizer=None, max_batches=No
     model.train(training)
     started = time.perf_counter()
     total_loss, total_weight, ids, truth, probabilities = 0., 0., [], [], []
+    gate_statistics = {}
     for step, batch in enumerate(data):
         if max_batches is not None and step >= max_batches:
             break
@@ -186,13 +221,41 @@ def epoch(model, data, criterion, config, device, optimizer=None, max_batches=No
         ids.extend(batch['sample_id'])
         truth.extend(batch['label'].detach().cpu().tolist())
         probabilities.extend(logits.detach().float().softmax(1).cpu().tolist())
+        if getattr(model, 'last_gate', None) is not None:
+            scales = model.last_gate.float().cpu().tolist()
+            masks = batch['modality_mask'].detach().cpu().tolist()
+            for sample_id, mask, scale in zip(batch['sample_id'], masks, scales):
+                key = sample_id.split(':', 1)[0] + f':mask={int(mask[0])},{int(mask[1])}'
+                record = gate_statistics.setdefault(key, {
+                    'count': 0,
+                    'sum': [0., 0.],
+                    'sum_squares': [0., 0.],
+                    'min': [2., 2.],
+                    'max': [0., 0.],
+                    'near_boundary_count': [0, 0]
+                })
+                record['count'] += 1
+                for index, value in enumerate(scale):
+                    record['sum'][index] += value
+                    record['sum_squares'][index] += value * value
+                    record['min'][index] = min(record['min'][index], value)
+                    record['max'][index] = max(record['max'][index], value)
+                    record['near_boundary_count'][index] += int(
+                        value <= .05 or value >= 1.95
+                    )
     if not ids:
         raise ValueError('No batches processed')
     metrics, _, _, _, _ = calculate_metrics(np.asarray(truth), np.asarray(probabilities), class_names=NINE_CLASSES)
     seconds = time.perf_counter() - started
-    return {'loss': total_loss / total_weight, **metrics, 'seconds': seconds, 'samples_per_second': len(ids) / seconds,
+    result = {'loss': total_loss / total_weight, **metrics, 'seconds': seconds, 'samples_per_second': len(ids) / seconds,
             'sample_order_sha256': fingerprint(ids),
             'ids': ids, 'labels': truth, 'probabilities': probabilities}
+    if gate_statistics:
+        result['gate_diagnostics'] = {
+            'near_boundary_rule': 'scale <= .05 or scale >= 1.95',
+            'by_source_and_mask': gate_statistics
+        }
+    return result
 
 
 def predictions(path, result):
@@ -207,8 +270,26 @@ def save_checkpoint(path, value):
 
 def load_checkpoint(path):
     value = torch.load(path, map_location='cpu', weights_only=True)
-    if value.get('format') != 'resnet9-checkpoint-v1' or value.get('class_order') != list(NINE_CLASSES) or value.get('preprocess') != PREPROCESS:
+    if value.get('format') not in ('resnet9-checkpoint-v1', NEW_CHECKPOINT_FORMAT) or value.get('class_order') != list(NINE_CLASSES) or value.get('preprocess') != PREPROCESS:
         raise ValueError('Checkpoint schema / preprocessing mismatch')
+
+    validate_identity(value['config'])
+
+    if is_new(value['config']):
+        from .metadata_features import MetadataEncoder
+        metadata_dim = MetadataEncoder.from_dict(value['metadata']).output_dim
+        expected = model_contract(
+            value['config'],
+            metadata_dim,
+            value['inputs']['components']
+        )
+        if value['format'] != NEW_CHECKPOINT_FORMAT or value.get('model_contract') != expected:
+            raise ValueError('Checkpoint model contract mismatch')
+        if value['config']['monet'] and value.get('text_features_sha256') != text_features_digest(value['model']):
+            raise ValueError('MONET text feature identity mismatch')
+    elif value['format'] != 'resnet9-checkpoint-v1':
+        raise ValueError('Legacy model requires its original checkpoint format')
+
     return value
 
 
@@ -234,6 +315,8 @@ def run(config, fold, output, *, smoke=False, resume=False, device_name='cuda', 
             raise ValueError('Refit requires a completed formal five-fold summary')
         if refit_summary['config'] != config or refit_summary['manifest_sha256'] != inputs['manifest_sha256']:
             raise ValueError('Refit data / config differs from CV')
+        if is_new(config) and refit_summary.get('components') != inputs['components']:
+            raise ValueError('Refit pretrained components differ from CV')
         if not 1 <= refit_summary['refit_epochs'] <= config['max_epochs']:
             raise ValueError('Invalid refit epoch count')
         train = read_csv(resolve(config['manifests']) / 'milk_dev.csv')
@@ -258,9 +341,19 @@ def run(config, fold, output, *, smoke=False, resume=False, device_name='cuda', 
     signature = fingerprint({'config': config, 'inputs': inputs, 'code': code['source_sha256'],
                              'smoke': smoke, 'smoke_epochs': smoke_epochs if smoke else None})
     encoder = fit_metadata(train) if config['metadata'] else None
-    model = ResNetExperiment(config['modality'], encoder.output_dim if encoder else 0, resolve(config['weights'])).to(device)
-    if config['channels_last']:
-        model.to(memory_format=torch.channels_last)
+    model = build_model(
+        config,
+        encoder.output_dim if encoder else 0,
+        initialize=True,
+        components=inputs.get('components'),
+        legacy_constructor=ResNetExperiment
+    )
+    prepare_model(model, config, device)
+    contract = model_contract(
+        config,
+        encoder.output_dim if encoder else 0,
+        inputs.get('components', {})
+    )
     optimizer = torch.optim.AdamW(model.optimizer_groups(config['head_lr'], config['backbone_lr']), weight_decay=config['weight_decay'])
     criterion, loss_record = classification_loss(train, config['weighted'], device)
     train_loader = loader(train, config, encoder, True, device)
@@ -273,7 +366,7 @@ def run(config, fold, output, *, smoke=False, resume=False, device_name='cuda', 
         best_checkpoint = load_checkpoint(output / 'best.pt')
         if best_checkpoint['epoch'] != checkpoint['best_epoch'] or best_checkpoint['signature'] != signature:
             raise ValueError('Inconsistent last/best checkpoints; do not silently resume')
-        model.load_state_dict(checkpoint['model'])
+        restore_model(model, checkpoint['model'], config)
         optimizer.load_state_dict(checkpoint['optimizer'])
         start_epoch, best_score, best_epoch = checkpoint['epoch'], checkpoint['best_score'], checkpoint['best_epoch']
         history = checkpoint['history']
@@ -294,6 +387,19 @@ def run(config, fold, output, *, smoke=False, resume=False, device_name='cuda', 
         'started_utc': datetime.now(timezone.utc).isoformat(), 'resume_from_epoch': start_epoch,
         'train_samples': len(train), 'val_samples': len(val), 'stop_reason': None,
         'smoke_epochs': smoke_epochs if smoke else None, 'data_coverage': {'train': coverage(train), 'val': coverage(val)}}
+    if contract is not None:
+        record['environment']['foundation_packages'] = foundation_environment()
+        record.update(
+            configuration_id=config['experiment'],
+            model_contract=contract,
+            parameters={
+                'total': sum(p.numel() for p in model.parameters()),
+                'trainable': sum(
+                    p.numel() for p in model.parameters()
+                    if p.requires_grad
+                )
+            }
+        )
     write_json(output / 'run.json', record)
     write_json(output / 'config.json', config)
     write_json(output / 'metadata.json', encoder.to_dict() if encoder else None)
@@ -320,12 +426,16 @@ def run(config, fold, output, *, smoke=False, resume=False, device_name='cuda', 
                 best_score, best_epoch = (-1. if refit_summary else val_result['macro_f1']), current
             history.append({'epoch': current, 'train': compact(train_result), 'val': compact(val_result) if val_result else None,
                 'peak_allocated_gib': torch.cuda.max_memory_allocated(device) / 2**30 if device.type == 'cuda' else None})
-            value = {'format': 'resnet9-checkpoint-v1', 'signature': signature, 'config': config, 'inputs': inputs,
+            value = {'format': NEW_CHECKPOINT_FORMAT if contract is not None else 'resnet9-checkpoint-v1', 'signature': signature, 'config': config, 'inputs': inputs,
                 'class_order': list(NINE_CLASSES), 'preprocess': PREPROCESS, 'metadata': encoder.to_dict() if encoder else None,
                 'phase': phase, 'refit_complete': bool(refit_summary and current == total_epochs),
-                'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'epoch': current,
+                'model': checkpoint_state(model, config), 'optimizer': optimizer.state_dict(), 'epoch': current,
                 'best_score': best_score, 'best_epoch': best_epoch, 'history': history,
                 'torch_rng': torch.get_rng_state(), 'cuda_rng': torch.cuda.get_rng_state_all() if device.type == 'cuda' else []}
+            if contract is not None:
+                value['model_contract'] = contract
+                if config['monet']:
+                    value['text_features_sha256'] = text_features_digest(value['model'])
             save_checkpoint(output / 'last.pt', value)
             if improved:
                 save_checkpoint(output / 'best.pt', value)
@@ -367,6 +477,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--data-root')
     parser.add_argument('--weights')
+    parser.add_argument('--panderm-weights')
+    parser.add_argument('--monet-dir')
     parser.add_argument('--manifests')
     parser.add_argument('--workers', type=int)
     parser.add_argument('--smoke', action='store_true')
@@ -375,7 +487,17 @@ def main():
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--preflight-only', action='store_true')
     args = parser.parse_args()
-    overrides = {k: v for k, v in vars(args).items() if k in ('data_root', 'weights', 'manifests', 'workers') and v is not None}
+    overrides = {
+        k: v for k, v in vars(args).items()
+        if k in (
+            'data_root',
+            'weights',
+            'panderm_weights',
+            'monet_dir',
+            'manifests',
+            'workers'
+        ) and v is not None
+    }
     config = configuration(args.config, overrides)
     if args.preflight_only:
         train, val, info = preflight(config, args.fold)

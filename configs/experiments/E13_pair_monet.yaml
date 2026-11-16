@@ -1,0 +1,9 @@
+experiment: E13
+modality: pair
+weighted: true
+include_isic: true
+metadata: true
+gate: false
+panderm: false
+monet: true
+monet_dir: pretrained_weights/monet/1d1efd0b8d61bde82cde22d2e93c28d73441f29e
