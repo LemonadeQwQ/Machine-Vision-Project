@@ -177,15 +177,7 @@ Fixed holdout inference continues to require a completed development-refit check
 
 E11–E13 implementations and configurations are integrated with the public data and evaluation interfaces. Offline validation of this public candidate is recorded in [the contribution record](contributions.md). This integration does not claim GPU validation of the exact public source tree.
 
-Formal E11–E13 five-fold CV results are not included in this public delivery. The completed E00–E10 results and earlier refit and holdout evaluations remain unchanged.
-
-
-
-
-
-
-
-
+Aggregate E11–E14 five-fold results are included in the [result summary](../reports/experiments/20261115_e11_e14_summary/SUMMARY.md). The completed E00–E10 results and earlier refit and holdout evaluations remain unchanged.
 
 ## E14: Pairwise and Three-Component Experiments
 
@@ -236,11 +228,9 @@ Refit requires a completed formal five-fold summary and uses the recorded config
 
 A new output directory must be used. Refit must not be started from an unrelated fold checkpoint or an earlier experiment's trained weights.
 
-This command documents the public interface. It is not a request to launch another training run or repeat an existing refit.
-
 ### Results and Reproducibility
 
-Aggregate experiment results are maintained in the separate evaluation delivery.
+Aggregate experiment results are integrated in the [result summary](../reports/experiments/20261115_e11_e14_summary/SUMMARY.md).
 
 The public source and documentation describe the supported model configurations and interfaces. They do not claim that the public file tree is byte-for-byte identical to the historical GPU training snapshots.
 

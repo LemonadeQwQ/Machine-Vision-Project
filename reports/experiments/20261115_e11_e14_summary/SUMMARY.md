@@ -25,7 +25,7 @@ GPM's best epochs are 23, 19, 46, 55, 47; the fixed refit length is their median
 
 The new 35-fold acceptance used the user's approved reduced scope: completion histories, saved-prediction metric recomputation, OOF membership checks, and byte-level checksums of recovered artifacts. It did not reload every formal checkpoint or rerun all formal validation predictions. Earlier synthetic/GPU smoke checks remain separate evidence. E10's earlier acceptance remains as documented in its original public report.
 
-These are results of the frozen training snapshots below. The public C branch and a future A/B/C integration have different full source fingerprints; this publication does not claim that the current C-only public tree produced those GPU runs. Refit must retain its selected CV source/configuration/asset checks. Checksums identify the underlying records, but raw run records and case-level inputs are not distributed here, so this aggregate-only release is insufficient by itself to repeat training or independently recompute OOF predictions.
+These are results of the frozen training snapshots below. The integrated public tree has a different full source fingerprint; this publication does not claim that this public tree produced those GPU runs. Refit must retain its selected CV source/configuration/asset checks. Checksums identify the underlying records, but raw run records and case-level inputs are not distributed here, so this aggregate-only release is insufficient by itself to repeat training or independently recompute OOF predictions.
 
 | Configuration | Frozen training-source SHA256 | Original aggregate-summary SHA256 |
 |---|---|---|

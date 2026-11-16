@@ -1,6 +1,6 @@
 # E14-GPM and fixed-epoch refit public contract
 
-C provides synthetic three-component and refit tests, evaluation/readiness adaptations and aggregate evidence. The branch still requires B's four E14 configurations, grouped registry and neutral Gate initialization-order fix; the exact paths are in the [pair contract](e14_pairs_implementation.md). The group is `triple = ('E14-GPM',)` with all three component flags enabled. C does not submit B's files.
+A/B/C's input protocol, model/configuration dependencies, synthetic tests and aggregate evidence are integrated. Exact dependency paths are in the [pair contract](e14_pairs_implementation.md). The group is `triple = ('E14-GPM',)` with all three component flags enabled.
 
 GPM retains the pair protocol, PanDerm dermoscopic features, clinical ResNet encoder, neutral Gate and frozen MONET concepts. The common parameters and initial output match E14-PM before Gate learning. Missing clinical images bypass that encoder and keep neutral scaling. The checkpoint has the same v2/external MONET contract as the single and pair configurations.
 

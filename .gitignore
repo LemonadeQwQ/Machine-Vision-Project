@@ -63,3 +63,6 @@ pretrained_weights/
 # C E14 review scratch and reviewed aggregate figure.
 /.c-e14-public-review-20261115/
 !reports/experiments/20261115_e11_e14_summary/comparison_macro_f1.png
+
+# Local integration review materials.
+/.abc-e14-review-*/

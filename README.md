@@ -4,11 +4,11 @@ Nine-class skin-lesion classification with ResNet-50, dermoscopic and clinical
 images, and controlled comparisons of class weighting, ISIC expansion, metadata
 and augmentation.
 
-## C's E14 evaluation and aggregate delivery — 2026-11-16
+## E14 A/B/C integration and aggregate results — 2026-11-16
 
-This branch adds C's E14 readiness adaptation, pair/triple/refit tests, public method documentation, and [aggregate E11–E14 results](reports/experiments/20261115_e11_e14_summary/SUMMARY.md). All 35 new CV folds completed under their recorded training snapshots. GPM ranks first by mean macro F1 (61.09%), but its advantage over E12 is only 0.57 percentage points and 2/5 paired folds; superiority remains uncertain. The selected 46-epoch refit was last observed queued, with actual start unconfirmed and no new holdout result.
+This version integrates A's input protocol, B's four E14 configurations and model changes, and C's readiness adaptation, pair/triple/refit tests, public documentation and [aggregate E11–E14 results](reports/experiments/20261115_e11_e14_summary/SUMMARY.md). All 35 new CV folds completed under their recorded training snapshots. GPM ranks first by mean macro F1 (61.09%), but its advantage over E12 is only 0.57 percentage points and 2/5 paired folds; superiority remains uncertain. The selected 46-epoch refit was last observed queued, with actual start unconfirmed and no new holdout result.
 
-**B's E14 integration is pending.** This C-only branch does not include B's four configurations, grouped registry or model initialization-order fix. CI explicitly reports those missing dependencies; no tests are skipped to imply a complete integration. Local validation with a temporary dependency overlay is recorded separately. See the [pair contract](docs/e14_pairs_implementation.md), [GPM/refit contract](docs/e14_gpm_implementation.md), and [exact A/B/C delivery responsibilities](docs/contributions.md).
+The four E14 configurations, grouped registry and neutral Gate initialization fix are integrated. CI checks their dependencies and runs seven offline test suites. See the [pair contract](docs/e14_pairs_implementation.md), [GPM/refit contract](docs/e14_gpm_implementation.md), and [exact A/B/C delivery responsibilities](docs/contributions.md).
 
 No new case-level records, trained models, cluster scripts, accounts or raw logs are published. Existing public evaluation interfaces and historical authors remain intact.
 

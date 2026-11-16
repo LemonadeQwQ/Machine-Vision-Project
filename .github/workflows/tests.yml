@@ -58,7 +58,7 @@ jobs:
           if 'NINE_CLASSES' not in schema or 'validate_class_order' not in schema:
               missing.append('updated src/class_schema.py')
           if missing:
-              print('::error::Missing protocol dependencies (C E14 delivery awaits B configuration/model integration): ' + ', '.join(missing))
+              print('::error::Missing protocol dependencies: ' + ', '.join(missing))
               raise SystemExit(1)
           PY
       - name: Install CPU PyTorch
