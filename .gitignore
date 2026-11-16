@@ -59,3 +59,7 @@ pretrained_weights/
 !reports/holdout/20261031_holdout_e10_e07_v1/E07/evaluation/confusion_matrix_normalized.png
 !reports/holdout/20261031_holdout_e10_e07_v1/E10/evaluation/confusion_matrix.png
 !reports/holdout/20261031_holdout_e10_e07_v1/E10/evaluation/confusion_matrix_normalized.png
+
+# C E14 review scratch and reviewed aggregate figure.
+/.c-e14-public-review-20261115/
+!reports/experiments/20261115_e11_e14_summary/comparison_macro_f1.png

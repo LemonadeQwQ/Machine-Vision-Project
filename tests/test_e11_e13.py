@@ -90,7 +90,7 @@ class E11E13Tests(unittest.TestCase):
         torch.set_num_threads(2)
 
     def test_registry_and_single_change_definitions(self):
-        self.assertEqual(EXPERIMENTS[-3:], ('E11', 'E12', 'E13'))
+        self.assertEqual(EXPERIMENTS[11:14], ('E11', 'E12', 'E13'))
         original = config(10)
         self.assertNotIn('gate', original)
         for number, enabled in ((11, 'gate'), (12, 'panderm'), (13, 'monet')):
@@ -323,7 +323,7 @@ class E11E13Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             rows = collect(root / 'empty', root / 'status.csv')
-            self.assertEqual(len(rows), 70)
+            self.assertEqual(len(rows), 90)
             self.assertEqual({row['status'] for row in rows}, {'planned'})
         current = config(11)
         contract = model_contract(current, 20, components(11))

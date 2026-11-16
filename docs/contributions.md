@@ -1,8 +1,58 @@
 # 分工、实现与复核状态
 
+## 2026-11-16：C 的 E14 与聚合结果增量
+
+基线为已完成E11–E13整合的public main `196c7d0`（[PR #8](https://github.com/LemonadeQwQ/Machine-Vision-Project/pull/8)）。本次分支 `feat/c-1115-e14-evaluation` 仅提交C负责的19个路径，未合入main。此前A/B/C原始提交及作者继续保留。实现由集成人在AI协助下统一完成；分工是领取、解释、复核和提交责任，不代表三位分别独立实现，人工复核仍pending。
+
+### A：1份公开输入说明
+
+- `docs/data_protocol.md`：补E14沿用冻结五折、ISIC训练侧、缺失模态与完整开发集refit边界；没有新数据代码或划分需要重复提交。
+
+### B：6份依赖代码／配置及1份说明
+
+- `configs/experiments/E14-GP_pair_gate_panderm.yaml`
+- `configs/experiments/E14-GM_pair_gate_monet.yaml`
+- `configs/experiments/E14-PM_pair_panderm_monet.yaml`
+- `configs/experiments/E14-GPM_pair_gate_panderm_monet.yaml`
+- `src/experiment_registry.py`
+- `src/models/next_stage.py`
+- `docs/training.md`
+
+注册表必须包括四个E14身份与分组；Gate初始化必须保持GM与E13、GPM与PM共享参数中性等价。C的综合测试依赖这些改动，但这些文件不属于本C提交。A/B须自行领取并复核，不用C分支的作者冒充其本人工作。
+
+### C：本次提交的19个路径
+
+- `scripts/check_training_ready.py`
+- `tests/test_e11_e13.py`
+- `tests/test_resnet_protocol.py`
+- `tests/test_e14_pairs.py`
+- `tests/test_e14_gpm.py`
+- `tests/test_e14_gpm_refit.py`
+- `README.md`
+- `docs/contributions.md`
+- `docs/experiment_plan.md`
+- `docs/model_selection.md`
+- `docs/e14_pairs_implementation.md`
+- `docs/e14_gpm_implementation.md`
+- `.github/workflows/tests.yml`
+- `.gitignore`
+- `.gitattributes`
+- `reports/experiments/20261115_e11_e14_summary/SUMMARY.md`
+- `reports/experiments/20261115_e11_e14_summary/summary_metrics.csv`
+- `reports/experiments/20261115_e11_e14_summary/fold_metrics.csv`
+- `reports/experiments/20261115_e11_e14_summary/comparison_macro_f1.png`
+
+`scripts/collect_results.py` 和 `scripts/summarize_cv.py` 已支持注册表与组件契约，本轮无需重复修改。三份新测试公开适配后保留模型／训练／refit语义；调度、资源、提交回执、集群进度专用测试及脚本留在内部，不用永久skip占位。`src/evaluate.py`、`src/metrics.py`、`tests/test_evaluate.py`、`tests/test_evaluation_schemas.py`保持基线字节，保留显式类别和旧CLI行为。
+
+本C分支因缺B依赖尚不能作为完整E14训练／测试版本；CI预检会据实失败。临时候选接入B六份依赖后的离线验证单独记录，不能称为此C分支CI通过。聚合结果来自冻结的正式运行，不能称当前公开源码已完成GPU训练。新35折采用精简回收验收，未声称全部正式模型重载／重推理；GPM refit仅记录最后已保存的排队状态，无新holdout成绩。
+
+本地临时整合候选仅额外接入上述B的6份代码／配置，七组测试实际通过 **61 项**：协议20、schema4、评估12、E11–E13 17、pairs4、GPM3、refit1。C单分支的相同依赖预检则明确失败；未安装依赖、下载权重或运行真实训练／推理。78个本地文档链接及公开内容核对通过，原public评估／schema文件保持基线字节。
+
+最终按A → B → C整合同一候选，运行全部七组公开测试并核对实际CI后再考虑合入main。共享README、CI、综合测试和聚合报告由C统一维护；不整仓合并内部历史，不重跑已完成实验来凑提交。
+
 更新日期：2026-11-15。实现、运行与整理由集成人统一完成，AI 协助。A／B／C 是组员接收代码、复核和提交 public 的责任范围，不是三套独立项目，也不代表这些实现已经分别由三位组员独立完成。
 
-## 11 月 15 日 E11～E13 的 A／B／C 整合
+## 11 月 15 日 E11～E13 的 A／B／C 整合（此前交付历史）
 
 本次以 public main `cfafd05` 为共同基线，按 A → B → C 合并为同一候选，
 保留下面的原始提交和作者；没有合并 private 整仓历史或 E14 增量。
