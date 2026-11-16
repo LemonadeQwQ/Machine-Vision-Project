@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.class_schema import NINE_CLASSES
 from src.data.common import digest, fingerprint, read_csv, write_csv, write_json
 from src.evaluate import evaluate_files, load_evaluation_data
+from src.experiment_registry import is_new, validate_run_identity, comparison_contract
 
 
 def summarize(run_root, manifests, output):
@@ -21,6 +22,7 @@ def summarize(run_root, manifests, output):
     for fold in range(5):
         folder = run_root / f'fold_{fold}'
         run = json.loads((folder / 'run.json').read_text(encoding='utf-8'))
+        validate_run_identity(run)
         if run['status'] != 'completed' or run['purpose'] != 'formal' or run['fold'] != fold or run.get('phase', 'cross_validation') != 'cross_validation':
             raise ValueError('Only completed formal CV folds may be summarized')
         if not run['code'].get('source_sha256') or run['inputs']['manifest_sha256'] != digest(manifests / 'version.json'):
@@ -29,6 +31,8 @@ def summarize(run_root, manifests, output):
             raise ValueError('Mixed experiment / config / protocol')
         if runs and run['code']['source_sha256'] != runs[0]['code']['source_sha256']:
             raise ValueError('Mixed source versions')
+        if runs and is_new(run['config']) and comparison_contract(run['model_contract']) != comparison_contract(runs[0]['model_contract']):
+            raise ValueError('Mixed model components / pretrained files')
         _, labels, probs = load_evaluation_data(manifests / f'folds/fold_{fold}/val.csv', folder / 'predictions.csv', class_names=NINE_CLASSES, id_column='sample_id')
         from src.evaluate import calculate_metrics
         metrics = calculate_metrics(labels, probs, class_names=NINE_CLASSES)[0]
@@ -53,6 +57,10 @@ def summarize(run_root, manifests, output):
         'refit_epochs': int(statistics.median(r['best_epoch'] for r in runs)),
         'selection_note': 'Fold best Macro F1, earliest tie; development selection estimates; refit uses median best epoch',
         'source_runs': {f'fold_{i}/run.json': digest(run_root / f'fold_{i}/run.json') for i in range(5)}}
+    if is_new(runs[0]['config']):
+        summary.update(configuration_id=runs[0]['configuration_id'],
+                       model_contract=comparison_contract(runs[0]['model_contract']), components=runs[0]['inputs']['components'],
+                       fold_metadata_dims={str(r['fold']): r['model_contract']['metadata_dim'] for r in runs})
     write_json(output / 'cv_summary.json', summary)
     write_csv(output / 'fold_metrics.csv', [{'fold': r['fold'], 'best_epoch': r['best_epoch'], **r['verified_metrics']} for r in runs])
     return summary

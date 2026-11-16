@@ -13,6 +13,7 @@ jobs:
       - name: Check protocol dependencies
         run: |
           python - <<'PY'
+          import ast
           from pathlib import Path
           required = (
               'src/data/common.py', 'src/data/manifest.py',
@@ -20,13 +21,29 @@ jobs:
               'src/metadata_features.py', 'configs/schema/label_mapping.csv',
               'src/experiment.py', 'src/models/fusion.py', 'src/losses.py',
               'configs/experiments/base.yaml', 'configs/schema/pretrained_weights.json',
+              'src/experiment_registry.py', 'src/models/factory.py',
+              'src/models/foundation.py', 'src/models/next_stage.py',
+              'src/infer.py', 'src/cross_validate.py', 'requirements-foundation.txt',
+              'configs/experiments/E11_pair_gate.yaml',
+              'configs/experiments/E12_pair_panderm.yaml',
+              'configs/experiments/E13_pair_monet.yaml',
+              'stages/panderm_stage/vendor/modeling_finetune.py',
+              'stages/panderm_stage/vendor/SOURCE.md',
+              'stages/monet_stage/reference/ATTRIBUTION.md',
+              'stages/monet_stage/reference/MONET_LICENSE.txt',
           )
           missing = [name for name in required if not Path(name).is_file()]
+          common = Path('src/data/common.py')
+          if common.is_file():
+              functions = {node.name for node in ast.parse(common.read_text(encoding='utf-8')).body
+                           if isinstance(node, ast.FunctionDef)}
+              if 'training_source_files' not in functions:
+                  missing.append('A update: src/data/common.py::training_source_files')
           schema = Path('src/class_schema.py').read_text(encoding='utf-8')
           if 'NINE_CLASSES' not in schema or 'validate_class_order' not in schema:
               missing.append('updated src/class_schema.py')
           if missing:
-              print('::error::Missing protocol dependencies: ' + ', '.join(missing))
+              print('::error::Missing protocol dependencies (E11-E13 require A/B integration): ' + ', '.join(missing))
               raise SystemExit(1)
           PY
       - name: Install CPU PyTorch
@@ -38,6 +55,7 @@ jobs:
           python -B -m unittest discover -s tests -p test_resnet_protocol.py -v
           python -B -m unittest discover -s tests -p test_evaluation_schemas.py -v
           python -B -m unittest discover -s tests -p test_evaluate.py -v
+          python -B -m unittest discover -s tests -p test_e11_e13.py -v
         env:
           HF_HUB_OFFLINE: '1'
           TRANSFORMERS_OFFLINE: '1'
