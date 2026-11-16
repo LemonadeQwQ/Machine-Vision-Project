@@ -1,0 +1,8 @@
+experiment: E14-PM
+modality: pair
+weighted: true
+include_isic: true
+metadata: true
+gate: false
+panderm: true
+monet: true

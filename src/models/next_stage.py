@@ -37,9 +37,9 @@ class NextStageExperiment(nn.Module):
         # initialization also preserves the baseline head's random sequence.
         self.classifier = nn.Sequential(nn.Linear(self.derm_dim + 2048 + 2 + 64 + 4 + (32 if config['monet'] else 0), 512),
                                         nn.ReLU(), nn.Dropout(.5), nn.Linear(512, 9))
-        self.gate = ModalityGate(self.derm_dim, hidden=config['gate_hidden']) if config['gate'] else None
         self.monet = FrozenMONET(local_path(config['monet_dir']), (expected_assets or {}).get('monet')) if config['monet'] else None
         self.concept_project = nn.Sequential(nn.Linear(4, 32), nn.LayerNorm(32), nn.GELU()) if config['monet'] else None
+        self.gate = ModalityGate(self.derm_dim, hidden=config['gate_hidden']) if config['gate'] else None
         self.last_gate = None
 
     def train(self, mode=True):
