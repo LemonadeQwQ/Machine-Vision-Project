@@ -19,3 +19,6 @@ stages/monet_stage/reference/MONET_LICENSE.txt -text
 
 # Preserve the approved aggregate E11-E14 publication bytes.
 reports/experiments/20261115_e11_e14_summary/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve exact aggregate final-model result bytes.
+reports/experiments/20261122_e14_gpm_final/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

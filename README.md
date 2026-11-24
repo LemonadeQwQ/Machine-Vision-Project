@@ -1,5 +1,11 @@
 # Machine-Vision-Project CSC490H5
 
+## Final GPM model and exploratory stopping-epoch results — 2026-11-22
+
+The final delivery uses the full-training-pool E14-GPM refit at epoch 35. On the fixed 1,037-case MILK holdout it achieved **58.68% nine-class macro F1**, **75.12% accuracy**, and **779 correct cases**. The original prespecified epoch-46 refit achieved 53.75% macro F1.
+
+Epoch 35 was selected after exploratory comparisons on the historically used holdout. All nine stopping epochs are reported together, with paired case-bootstrap intervals against epoch 46. Checkpoint identity, model tensors, sample order, predictions and metrics passed independent verification. See the [final aggregate results](reports/experiments/20261122_e14_gpm_final/SUMMARY.md), [selection record](docs/model_selection.md), [model loading instructions](docs/training.md), and [A/B/C responsibilities](docs/contributions.md).
+
 Nine-class skin-lesion classification with ResNet-50, dermoscopic and clinical
 images, and controlled comparisons of class weighting, ISIC expansion, metadata
 and augmentation.

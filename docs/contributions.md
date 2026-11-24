@@ -1,5 +1,19 @@
 # 分工、实现与复核状态
 
+## 2026-11-22 最终模型与结果交付责任
+
+本轮交付内容为 E14-GPM 第 35 轮最终模型的恢复说明、九档探索性对照及验证证据摘要。已有 E14 A/B/C 实现来源保留于下文 11 月 16 日记录。本轮每个目标文件由一名负责人维护。
+
+| 角色 | 路径数 | 负责上传的文件 |
+|---|---:|---|
+| A | 1 | `docs/data_protocol.md` |
+| B | 1 | `docs/training.md` |
+| C | 7 | `README.md`、`docs/model_selection.md`、`docs/experiment_plan.md`、`docs/contributions.md`、`.gitattributes`、`reports/experiments/20261122_e14_gpm_final/SUMMARY.md`、`reports/experiments/20261122_e14_gpm_final/comparison_metrics.csv` |
+
+A 复核冻结样本成员、数据单位与 holdout 参与最终选择的记录。B 复核第 35 轮真实身份、官方资产和模型恢复步骤。C 复核九档聚合指标、病例配对区间、原正式第 46 轮基线与当前文档状态，并统一处理共享文档链接。
+
+本轮准备版本的 public 基线为 `8a2735657b4f4338b8a9d0a727c9731c743878a0`。2026-11-24 的 C 分支 `docs/c-1124-final-gpm-results` 交付上表 C 的 7 个路径，来源为 private 提交 `d39e35564acc3c35ccdf6f9a2388e1c532415909`。A／B 本轮各 1 份文件仍由各自负责人复核提交；C 分支中的训练说明链接沿用 main，待 B 的第 35 轮恢复说明合入后更新其内容。public main 合并、CI 与人工交叉复核按各自实际完成记录确认。
+
 ## 2026-11-16：E14 A/B/C 整合
 
 以 public main `196c7d0` 为基线，整合 A `c2374a4`、B `c8c9129`、C `074400f`，保留三个原始提交。共 27 个不重叠路径，分工如下。
