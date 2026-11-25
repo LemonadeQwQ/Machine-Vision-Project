@@ -1,5 +1,13 @@
 # ResNet 九类数据协议 v1
 
+## 2026-11-22 固定 holdout 的最终模型选择记录
+
+最终交付采用 E14-GPM 完整 refit 第 35 轮。完整训练池为 3,968 个 MILK 开发病例和 20,279 个 ISIC 样本，固定 holdout 为 1,037 个 MILK 病例。九类顺序及冻结成员关系沿用既有协议。
+
+项目在原预定第 46 轮正式评估之后，先比较 CV fold_3 和 refit 的 15、28、46 轮，再确定 1、5、10、15、20、25、30、35、46 的探索网格。第 35 轮最终选择使用了这份 holdout 的结果，其 Macro F1 58.68% 和准确率 75.12% 按探索性选模后成绩报告。原固定第 46 轮正式基线为 Macro F1 53.75%。
+
+配对区间按病例有放回重采样 10,000 次，每次所有轮数共用索引。数据单位为病灶，原始数据未提供可用于患者级分组的完整标识。完整聚合比较见 [最终结果](../reports/experiments/20261122_e14_gpm_final/SUMMARY.md)。下文保留初始数据准备和历次验收记录。
+
 ## 来源和标签
 
 官方来源：[下载页](https://challenge.isic-archive.com/data/)、[MILK 类别定义](https://challenge.isic-archive.com/landing/milk10k/)、[ISIC 2019 类别定义](https://challenge.isic-archive.com/landing/2019/)。
